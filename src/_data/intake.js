@@ -1,7 +1,9 @@
-// Populate these lookup lists from Deltek exports when available.
-const employeeList = [];
-const deltekClients = [];
-const internalOrganizations = ["Tandem DET", "Tandem CAN", "Baird AE", "A3C"];
+const lookups = require("./intake-lookups.json");
+
+const projectManagers = lookups.projectManagers || lookups.employees || [];
+const managingPrincipals = lookups.managingPrincipals || lookups.employees || [];
+const deltekClients = lookups.primaryClients || [];
+const internalOrganizations = lookups.organizations || [];
 const probabilityOptions = ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"];
 
 module.exports = {
@@ -12,20 +14,11 @@ module.exports = {
     { key: "Supplier PO", short: "PO" }
   ],
   vendorTypes: ["Promo", "Supplier PO"],
-  vendors: [
-    { id: "V-10014", name: "Acme Promotional Products", category: "Promotional", contact: "orders@acmepromo.example", terms: "Net 30", status: "Active" },
-    { id: "V-10208", name: "Brightline Print Services", category: "Print", contact: "accounting@brightline.example", terms: "Net 15", status: "Active" },
-    { id: "V-10442", name: "Compass Office Supply", category: "Office Supply", contact: "support@compass.example", terms: "Net 30", status: "Active" },
-    { id: "V-10719", name: "Northstar Technical Staffing", category: "Professional Services", contact: "deltek@northstar.example", terms: "Net 45", status: "Active" },
-    { id: "V-11063", name: "Summit Hardware and Safety", category: "Materials", contact: "sales@summiths.example", terms: "Net 30", status: "Active" },
-    { id: "V-11501", name: "Keystone Logistics", category: "Freight", contact: "dispatch@keystone.example", terms: "Net 20", status: "Active" },
-    { id: "V-11877", name: "Harbor Event Rentals", category: "Events", contact: "team@harborrentals.example", terms: "Due on receipt", status: "Active" },
-    { id: "V-12005", name: "Pinnacle Software Group", category: "Software", contact: "billing@pinnaclesg.example", terms: "Annual", status: "Active" }
-  ],
+  vendors: lookups.vendors || [],
   commonFields: [
     { name: "requestTitle", label: "Title of Request", type: "text", required: true, full: true },
-    { name: "projectManager", label: "Project Manager", type: "lookup", required: true, options: employeeList },
-    { name: "managingPrincipal", label: "Managing Principal", type: "lookup", required: true, options: employeeList },
+    { name: "projectManager", label: "Project Manager", type: "lookup", required: true, options: projectManagers },
+    { name: "managingPrincipal", label: "Managing Principal", type: "lookup", required: true, options: managingPrincipals },
     { name: "organization", label: "Organization", type: "select", required: true, options: internalOrganizations },
     { name: "estimatedStartDate", label: "Estimated Start Date", type: "date", required: true },
     { name: "estimatedFinishDate", label: "Estimated finish date", type: "date", required: true }

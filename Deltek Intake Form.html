@@ -814,6 +814,7 @@
     const queueCount = document.getElementById("queueCount");
     const queueStatusFilter = document.getElementById("queueStatusFilter");
     const queueTypeFilter = document.getElementById("queueTypeFilter");
+    const fillSampleButton = document.getElementById("fillSample");
     const toast = document.getElementById("toast");
 
     let selectedType = "";
@@ -830,7 +831,7 @@
 
       form.addEventListener("submit", handleSubmit);
       document.getElementById("resetForm").addEventListener("click", resetForm);
-      document.getElementById("fillSample").addEventListener("click", fillSampleData);
+      fillSampleButton.addEventListener("click", fillSampleData);
       vendorSearch.addEventListener("input", renderVendorOptions);
       vendorSelect.addEventListener("change", renderVendorDetails);
       queueStatusFilter.addEventListener("change", renderQueue);
@@ -935,6 +936,7 @@
         specificFieldset.hidden = true;
         vendorFieldset.hidden = true;
         requestActions.hidden = true;
+        fillSampleButton.hidden = true;
         vendorSelect.required = false;
         specificFieldsContainer.innerHTML = "";
         specificLegend.textContent = "Required Information";
@@ -944,6 +946,7 @@
       commonFieldset.hidden = false;
       specificFieldset.hidden = false;
       requestActions.hidden = false;
+      fillSampleButton.hidden = false;
       specificLegend.textContent = `${selectedType} Required Information`;
       renderFieldList(specificFields[selectedType], specificFieldsContainer);
 
@@ -1050,28 +1053,79 @@
     }
 
     function fillSampleData() {
-      resetForm();
-      const today = new Date();
-      const closeDate = addDays(today, 45);
+      if (!selectedType) {
+        showToast("Select a request type before loading sample data.");
+        return;
+      }
 
-      selectedType = "Supplier PO";
-      renderTypeOptions();
-      renderSpecificFields();
+      const samples = getSampleData(selectedType);
+      if (!samples) return;
 
-      setValue("requestTitle", "Safety equipment order");
-      setValue("projectManager", "Jordan Lee");
-      setValue("managingPrincipal", "Taylor Morgan");
-      setValue("organization", "Tandem DET");
-      setValue("estimatedStartDate", formatDate(addDays(today, 10)));
-      setValue("estimatedFinishDate", formatDate(closeDate));
-      setValue("vendorId", "V-11063");
+      Object.entries(samples).forEach(([id, value]) => {
+        setValue(id, value);
+      });
       renderVendorDetails();
-      setValue("poDescription", "Replacement PPE and field safety supplies");
-      setValue("amount", "2850.00");
-      setValue("buyer", "Taylor Morgan");
-      setValue("deliveryDate", formatDate(closeDate));
-      setValue("deliverTo", "Richmond field office");
-      setValue("glOrProjectCode", "OPS-4521");
+    }
+
+    function getSampleData(type) {
+      const today = new Date();
+      const commonSample = {
+        requestTitle: {
+          Opportunity: "Automated inspection line pursuit",
+          Promo: "Safety week giveaway",
+          Project: "Packaging line controls upgrade",
+          "Supplier PO": "Safety equipment order"
+        }[type],
+        projectManager: "Jordan Lee",
+        managingPrincipal: "Taylor Morgan",
+        organization: "Tandem DET",
+        estimatedStartDate: formatDate(addDays(today, 10)),
+        estimatedFinishDate: formatDate(addDays(today, 45))
+      };
+
+      const typeSamples = {
+        Opportunity: {
+          opportunityName: "North plant modernization",
+          estimatedRevenue: "125000.00",
+          probability: "70%",
+          stage: "proposal",
+          engineeringCategory: "controls",
+          source: "Tradeshow",
+          primaryClient: "Atlas Manufacturing"
+        },
+        Promo: {
+          vendorId: "V-10014",
+          campaignName: "Safety week giveaway",
+          itemDescription: "Branded high-visibility safety shirts",
+          quantity: "150",
+          inHandsDate: formatDate(addDays(today, 30)),
+          budget: "3200.00",
+          shipTo: "Richmond field office"
+        },
+        Project: {
+          projectName: "Packaging line controls upgrade",
+          clientName: "Atlas Manufacturing",
+          projectCode: "PRJ-4521",
+          contractType: "Time and Materials"
+        },
+        "Supplier PO": {
+          vendorId: "V-11063",
+          poDescription: "Replacement PPE and field safety supplies",
+          amount: "2850.00",
+          buyer: "Taylor Morgan",
+          deliveryDate: formatDate(addDays(today, 45)),
+          deliverTo: "Richmond field office",
+          glOrProjectCode: "OPS-4521"
+        }
+      };
+
+      const typeSample = typeSamples[type];
+      if (!typeSample) return null;
+
+      return {
+        ...commonSample,
+        ...typeSample
+      };
     }
 
     function setValue(id, value) {

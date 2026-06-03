@@ -1,0 +1,91 @@
+{
+  "employees": [
+    "Jordan Lee",
+    "Taylor Morgan",
+    "Casey Rivera"
+  ],
+  "projectManagers": [
+    "Jordan Lee",
+    "Casey Rivera"
+  ],
+  "managingPrincipals": [
+    "Taylor Morgan"
+  ],
+  "organizations": [
+    "Tandem DET",
+    "Tandem CAN",
+    "Baird AE",
+    "A3C"
+  ],
+  "primaryClients": [
+    "Atlas Manufacturing",
+    "North Plant Operations",
+    "River City Packaging"
+  ],
+  "vendors": [
+    {
+      "id": "V-10014",
+      "name": "Acme Promotional Products",
+      "category": "Promotional",
+      "contact": "orders@acmepromo.example",
+      "terms": "Net 30",
+      "status": "Active"
+    },
+    {
+      "id": "V-10208",
+      "name": "Brightline Print Services",
+      "category": "Print",
+      "contact": "accounting@brightline.example",
+      "terms": "Net 15",
+      "status": "Active"
+    },
+    {
+      "id": "V-10442",
+      "name": "Compass Office Supply",
+      "category": "Office Supply",
+      "contact": "support@compass.example",
+      "terms": "Net 30",
+      "status": "Active"
+    },
+    {
+      "id": "V-10719",
+      "name": "Northstar Technical Staffing",
+      "category": "Professional Services",
+      "contact": "deltek@northstar.example",
+      "terms": "Net 45",
+      "status": "Active"
+    },
+    {
+      "id": "V-11063",
+      "name": "Summit Hardware and Safety",
+      "category": "Materials",
+      "contact": "sales@summiths.example",
+      "terms": "Net 30",
+      "status": "Active"
+    },
+    {
+      "id": "V-11501",
+      "name": "Keystone Logistics",
+      "category": "Freight",
+      "contact": "dispatch@keystone.example",
+      "terms": "Net 20",
+      "status": "Active"
+    },
+    {
+      "id": "V-11877",
+      "name": "Harbor Event Rentals",
+      "category": "Events",
+      "contact": "team@harborrentals.example",
+      "terms": "Due on receipt",
+      "status": "Active"
+    },
+    {
+      "id": "V-12005",
+      "name": "Pinnacle Software Group",
+      "category": "Software",
+      "contact": "billing@pinnaclesg.example",
+      "terms": "Annual",
+      "status": "Active"
+    }
+  ]
+}
