@@ -217,6 +217,16 @@ legend {
   outline: 2px solid transparent;
 }
 
+.type-option input:disabled + .type-label {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.type-option input:checked + .type-label {
+  cursor: default;
+  opacity: 1;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -460,7 +470,6 @@ textarea:focus {
   border: 1px solid #d8dfda;
 }
 
-.badge.priority-high,
 .badge.status-new {
   background: var(--accent-soft);
   border-color: #e8c5ac;

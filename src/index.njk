@@ -16,6 +16,20 @@ script: /assets/app.js
           <option value="{{ option }}">{{ option }}</option>
         {% endfor %}
       </select>
+    {% elif field.type == "lookup" %}
+      <input
+        id="{{ field.name }}"
+        name="{{ field.name }}"
+        type="text"
+        list="{{ field.name }}Options"
+        autocomplete="off"
+        {% if field.required %}required{% endif %}
+      >
+      <datalist id="{{ field.name }}Options">
+        {% for option in field.options %}
+          <option value="{{ option }}"></option>
+        {% endfor %}
+      </datalist>
     {% else %}
       <input
         id="{{ field.name }}"
@@ -126,8 +140,8 @@ script: /assets/app.js
           </div>
         </fieldset>
 
-        <div class="actions" id="formActions" hidden>
-          <div class="left-actions">
+        <div class="actions" id="formActions">
+          <div class="left-actions" id="requestActions" hidden>
             <button type="submit" class="btn btn-primary">Submit Intake</button>
             <button type="button" class="btn btn-secondary" id="resetForm">Reset Form</button>
           </div>

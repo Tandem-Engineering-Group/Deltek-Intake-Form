@@ -4,7 +4,7 @@
 
   const form = document.getElementById("intakeForm");
   const commonFieldset = document.getElementById("commonFieldset");
-  const formActions = document.getElementById("formActions");
+  const requestActions = document.getElementById("requestActions");
   const vendorFieldset = document.getElementById("vendorFieldset");
   const vendorSearch = document.getElementById("vendorSearch");
   const vendorSelect = document.getElementById("vendorId");
@@ -18,6 +18,7 @@
   const toast = document.getElementById("toast");
 
   const storageKey = "deltek-intake-queue-v2";
+  const legacyStorageKeys = ["deltek-intake-queue-v1"];
   const vendorTypes = app.dataset.vendorTypes.split(",").filter(Boolean);
   const allVendorOptions = Array.from(vendorSelect.options)
     .filter((option) => option.value)
@@ -68,6 +69,11 @@
 
   function handleFormChange(event) {
     if (event.target.matches("[data-type-radio]")) {
+      if (selectedType && event.target.value !== selectedType) {
+        event.target.checked = false;
+        return;
+      }
+
       setSelectedType(event.target.value);
     }
   }
@@ -78,7 +84,7 @@
 
     commonFieldset.hidden = !hasType;
     commonFieldset.disabled = !hasType;
-    formActions.hidden = !hasType;
+    requestActions.hidden = !hasType;
 
     document.querySelectorAll("[data-type-panel]").forEach((panel) => {
       const isActive = panel.dataset.typePanel === selectedType;
@@ -102,15 +108,22 @@
       requestIdInput.value = createRequestId(selectedType);
     }
 
+    updateTypeOptionsLock();
     renderVendorOptions();
     renderVendorDetails();
   }
 
+  function updateTypeOptionsLock() {
+    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
+      radio.disabled = Boolean(selectedType) && radio.value !== selectedType;
+    });
+  }
+
   function handleSubmit(event) {
+    event.preventDefault();
     const checkedType = form.querySelector("[data-type-radio]:checked");
 
     if (!checkedType) {
-      event.preventDefault();
       showToast("Select a request type.");
       return;
     }
@@ -120,16 +133,19 @@
     requestIdInput.value = requestIdInput.value || createRequestId(selectedType);
 
     if (!form.checkValidity()) {
-      event.preventDefault();
       form.reportValidity();
       return;
     }
 
-    storeLocalQueueItem();
+    const formData = new FormData(form);
+    storeLocalQueueItem(formData);
+    renderQueue();
+    resetIntakeForm();
+    showToast("Request saved to the work queue.");
+    submitIntakeForm(formData);
   }
 
-  function storeLocalQueueItem() {
-    const formData = new FormData(form);
+  function storeLocalQueueItem(formData) {
     const item = {
       id: requestIdInput.value,
       type: selectedType,
@@ -142,6 +158,18 @@
     queue = queue.filter((existing) => existing.id !== item.id);
     queue.unshift(item);
     saveQueue();
+  }
+
+  function submitIntakeForm(formData) {
+    if (window.location.protocol === "file:") return;
+
+    fetch(form.action, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString()
+    }).catch(() => {
+      showToast("Saved locally. Online submission did not complete.");
+    });
   }
 
   function renderVendorOptions() {
@@ -211,16 +239,14 @@
 
   function fillSampleData() {
     resetIntakeForm();
-    const supplierType = form.querySelector('[data-type-radio][value="Supplier PO"]');
-    supplierType.checked = true;
-    setSelectedType("Supplier PO");
+    selectRequestType("Supplier PO");
 
     setValue("requestTitle", "Safety equipment order");
-    setValue("requestedBy", "Jordan Lee");
-    setValue("department", "Operations");
-    setValue("needBy", formatDate(addDays(new Date(), 10)));
-    setValue("priority", "High");
-    setValue("notes", "Please route to purchasing after validation.");
+    setValue("projectManager", "Jordan Lee");
+    setValue("managingPrincipal", "Taylor Morgan");
+    setValue("organization", "Tandem DET");
+    setValue("estimatedStartDate", formatDate(addDays(new Date(), 10)));
+    setValue("estimatedFinishDate", formatDate(addDays(new Date(), 45)));
     setValue("vendorId", "V-11063");
     setValue("poDescription", "Replacement PPE and field safety supplies");
     setValue("amount", "2850.00");
@@ -231,22 +257,48 @@
     renderVendorDetails();
   }
 
+  function selectRequestType(type) {
+    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
+      radio.checked = radio.value === type;
+    });
+    setSelectedType(type);
+  }
+
   function setValue(id, value) {
     const element = document.getElementById(id);
     if (element) element.value = value;
   }
 
   function loadQueue() {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      return [];
+    for (const key of [storageKey, ...legacyStorageKeys]) {
+      const storedQueue = readStoredQueue(localStorage, key) || readStoredQueue(sessionStorage, key);
+      if (storedQueue) return storedQueue;
     }
+
+    return [];
   }
 
   function saveQueue() {
-    localStorage.setItem(storageKey, JSON.stringify(queue));
+    const serializedQueue = JSON.stringify(queue);
+    writeStoredQueue(localStorage, storageKey, serializedQueue);
+    writeStoredQueue(sessionStorage, storageKey, serializedQueue);
+  }
+
+  function readStoredQueue(storage, key) {
+    try {
+      const stored = storage.getItem(key);
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeStoredQueue(storage, key, value) {
+    try {
+      storage.setItem(key, value);
+    } catch (error) {
+      // The queue still works for the current page even if browser storage is unavailable.
+    }
   }
 
   function renderQueue() {
@@ -276,7 +328,6 @@
     const details = item.details || {};
     const title = details.requestTitle || `${item.type} request`;
     const vendorLine = item.vendor ? `Vendor: ${item.vendor.name}` : "No vendor lookup";
-    const priorityClass = details.priority === "High" ? "priority-high" : "";
     const statusClass = `status-${item.status.toLowerCase().replaceAll(" ", "-")}`;
     const rows = Object.entries(details)
       .filter(([key]) => !["form-name", "bot-field"].includes(key))
@@ -292,7 +343,6 @@
           </div>
           <div class="queue-badges">
             <span class="badge type">${escapeHtml(item.type)}</span>
-            <span class="badge ${escapeHtml(priorityClass)}">${escapeHtml(details.priority || "Normal")}</span>
             <span class="badge ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span>
           </div>
         </div>
@@ -359,7 +409,7 @@
       return;
     }
 
-    const headers = ["id", "type", "status", "createdAt", "requestTitle", "requestedBy", "department", "needBy", "priority", "vendorId", "vendorName", "details"];
+    const headers = ["id", "type", "status", "createdAt", "requestTitle", "projectManager", "managingPrincipal", "organization", "estimatedStartDate", "estimatedFinishDate", "vendorId", "vendorName", "details"];
     const rows = queue.map((item) => {
       const details = item.details || {};
       return [
@@ -368,10 +418,11 @@
         item.status,
         item.createdAt,
         details.requestTitle || "",
-        details.requestedBy || "",
-        details.department || "",
-        details.needBy || "",
-        details.priority || "",
+        details.projectManager || "",
+        details.managingPrincipal || "",
+        details.organization || "",
+        details.estimatedStartDate || "",
+        details.estimatedFinishDate || "",
         item.vendor ? item.vendor.id : "",
         item.vendor ? item.vendor.name : "",
         JSON.stringify(details)

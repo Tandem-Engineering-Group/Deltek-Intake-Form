@@ -1,3 +1,9 @@
+// Populate these lookup lists from Deltek exports when available.
+const employeeList = [];
+const deltekClients = [];
+const internalOrganizations = ["Tandem DET", "Tandem CAN", "Baird AE", "A3C"];
+const probabilityOptions = ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"];
+
 module.exports = {
   types: [
     { key: "Opportunity", short: "OPP" },
@@ -17,21 +23,22 @@ module.exports = {
     { id: "V-12005", name: "Pinnacle Software Group", category: "Software", contact: "billing@pinnaclesg.example", terms: "Annual", status: "Active" }
   ],
   commonFields: [
-    { name: "requestTitle", label: "Request title", type: "text", required: true, full: true },
-    { name: "requestedBy", label: "Requested by", type: "text", required: true },
-    { name: "department", label: "Department", type: "text", required: true },
-    { name: "needBy", label: "Need by", type: "date", required: true },
-    { name: "priority", label: "Priority", type: "select", required: true, options: ["Normal", "High", "Low"] },
-    { name: "notes", label: "Notes", type: "textarea", required: false, full: true }
+    { name: "requestTitle", label: "Title of Request", type: "text", required: true, full: true },
+    { name: "projectManager", label: "Project Manager", type: "lookup", required: true, options: employeeList },
+    { name: "managingPrincipal", label: "Managing Principal", type: "lookup", required: true, options: employeeList },
+    { name: "organization", label: "Organization", type: "select", required: true, options: internalOrganizations },
+    { name: "estimatedStartDate", label: "Estimated Start Date", type: "date", required: true },
+    { name: "estimatedFinishDate", label: "Estimated finish date", type: "date", required: true }
   ],
   specificFields: {
     "Opportunity": [
       { name: "opportunityName", label: "Opportunity name", type: "text", required: true },
-      { name: "customer", label: "Customer", type: "text", required: true },
-      { name: "estimatedValue", label: "Estimated value", type: "number", required: true, min: "0", step: "0.01" },
-      { name: "expectedCloseDate", label: "Expected close date", type: "date", required: true },
-      { name: "captureManager", label: "Capture manager", type: "text", required: true },
-      { name: "deltekOpportunityId", label: "Deltek opportunity ID", type: "text", required: false }
+      { name: "estimatedRevenue", label: "Est Revenue", type: "number", required: true, min: "0", step: "0.01" },
+      { name: "probability", label: "Probability", type: "select", required: true, options: probabilityOptions },
+      { name: "stage", label: "Stage", type: "select", required: true, options: ["preproposal", "proposal", "bid", "award", "pre-award"] },
+      { name: "engineeringCategory", label: "Engineering category", type: "select", required: true, options: ["industrial", "automotive", "electrical", "mechanical", "structural", "conveyor", "controls"] },
+      { name: "source", label: "Source", type: "select", required: true, options: ["Tradeshow", "bid", "government", "marketing", "other"] },
+      { name: "primaryClient", label: "Primary client", type: "lookup", required: true, options: deltekClients }
     ],
     "Promo": [
       { name: "campaignName", label: "Campaign or event", type: "text", required: true },
@@ -43,9 +50,7 @@ module.exports = {
     ],
     "Project": [
       { name: "projectName", label: "Project name", type: "text", required: true },
-      { name: "projectManager", label: "Project manager", type: "text", required: true },
       { name: "clientName", label: "Client", type: "text", required: true },
-      { name: "startDate", label: "Start date", type: "date", required: true },
       { name: "projectCode", label: "Project or charge code", type: "text", required: true },
       { name: "contractType", label: "Contract type", type: "select", required: true, options: ["Firm Fixed Price", "Time and Materials", "Cost Plus", "Internal"] }
     ],
