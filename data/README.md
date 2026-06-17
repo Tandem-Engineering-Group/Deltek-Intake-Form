@@ -36,7 +36,7 @@ Organization | Active
 `Clients`
 
 ```text
-Primary Client | Active
+Primary Client | Acnpm tive
 ```
 
 `Vendors`

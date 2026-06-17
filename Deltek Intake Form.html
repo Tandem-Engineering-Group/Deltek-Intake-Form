@@ -5,1405 +5,2305 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Deltek Intake Form</title>
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #f5f6f3;
-      --surface: #ffffff;
-      --surface-strong: #f0f4f1;
-      --ink: #1d2324;
-      --muted: #647071;
-      --line: #d8dfda;
-      --field: #fbfcfb;
-      --primary: #23675a;
-      --primary-ink: #ffffff;
-      --primary-soft: #dcece6;
-      --accent: #a8562a;
-      --accent-soft: #f4e4d7;
-      --danger: #b3261e;
-      --warning: #8a6200;
-      --success: #1f6d3d;
-      --shadow: 0 18px 45px rgba(27, 35, 36, 0.09);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      letter-spacing: 0;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-      letter-spacing: 0;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app-shell {
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto 1fr;
-    }
-
-    header {
-      background: #172122;
-      color: #ffffff;
-      border-bottom: 4px solid var(--accent);
-    }
-
-    .header-inner {
-      width: min(1420px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 24px 0 20px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .header-meta {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      color: #d5dcda;
-      font-size: 14px;
-    }
-
-    .meta-pill {
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 999px;
-      padding: 6px 10px;
-      white-space: nowrap;
-    }
-
-    main {
-      width: min(1420px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 24px 0 36px;
-      display: grid;
-      grid-template-columns: minmax(430px, 0.95fr) minmax(460px, 1.05fr);
-      gap: 22px;
-      align-items: start;
-    }
-
-    .surface {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .section-header {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--line);
-      background: var(--surface-strong);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 19px;
-      line-height: 1.2;
-    }
-
-    .count-badge {
-      min-width: 34px;
-      min-height: 30px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: var(--primary);
-      color: var(--primary-ink);
-      font-weight: 700;
-      padding: 4px 10px;
-    }
-
-    form {
-      padding: 20px;
-    }
-
-    fieldset {
-      border: 0;
-      padding: 0;
-      margin: 0 0 22px;
-    }
-
-    legend {
-      width: 100%;
-      margin: 0 0 12px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .type-options {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .type-option {
-      position: relative;
-      display: block;
-    }
-
-    .type-option input {
-      position: absolute;
-      opacity: 0;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      cursor: pointer;
-    }
-
-    .type-label {
-      min-height: 74px;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--field);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 8px;
-      transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
-    }
-
-    .type-title {
-      font-weight: 700;
-      line-height: 1.15;
-    }
-
-    .type-key {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .type-option input:focus-visible + .type-label,
-    .type-option input:checked + .type-label {
-      border-color: var(--primary);
-      background: var(--primary-soft);
-      color: #153d37;
-      outline: 2px solid transparent;
-    }
-
-    .type-option input:disabled + .type-label {
-      cursor: not-allowed;
-      opacity: 0.52;
-    }
-
-    .type-option input:checked + .type-label {
-      cursor: default;
-      opacity: 1;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      min-width: 0;
-    }
-
-    .field.full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      font-weight: 700;
-      color: #273032;
-      font-size: 14px;
-    }
-
-    .required {
-      color: var(--danger);
-      font-weight: 700;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      min-height: 42px;
-      border: 1px solid #cbd4ce;
-      border-radius: 6px;
-      background: var(--field);
-      color: var(--ink);
-      padding: 9px 10px;
-      outline: 0;
-    }
-
-    textarea {
-      min-height: 96px;
-      resize: vertical;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(35, 103, 90, 0.18);
-      background: #ffffff;
-    }
-
-    .vendor-panel {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfaf8;
-    }
-
-    .vendor-details {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 2px;
-    }
-
-    .detail-box {
-      min-height: 58px;
-      border: 1px solid #e2d7cc;
-      border-radius: 6px;
-      background: #ffffff;
-      padding: 9px;
-      overflow-wrap: anywhere;
-    }
-
-    .detail-label {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-
-    .detail-value {
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.25;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 4px;
-    }
-
-    .left-actions,
-    .right-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .btn {
-      min-height: 40px;
-      border: 1px solid transparent;
-      border-radius: 7px;
-      padding: 9px 13px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      max-width: 100%;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: var(--primary-ink);
-    }
-
-    .btn-primary:hover {
-      background: #1d574c;
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      border-color: #b9c5be;
-      color: #263032;
-    }
-
-    .btn-secondary:hover {
-      background: #f2f5f2;
-    }
-
-    .btn-danger {
-      background: #ffffff;
-      border-color: #e0b1ad;
-      color: var(--danger);
-    }
-
-    .btn-danger:hover {
-      background: #fff3f1;
-    }
-
-    .queue-tools {
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .filter-group select,
-    .filter-group input {
-      width: auto;
-      min-width: 160px;
-    }
-
-    .queue-list {
-      display: grid;
-      gap: 12px;
-      padding: 18px 20px 20px;
-    }
-
-    .queue-empty {
-      min-height: 160px;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      color: var(--muted);
-      border: 1px dashed #c4cec7;
-      border-radius: 8px;
-      background: #fbfcfb;
-      padding: 22px;
-    }
-
-    .queue-item {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #ffffff;
-      overflow: hidden;
-    }
-
-    .queue-item-head {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: start;
-      padding: 14px;
-      border-left: 5px solid var(--primary);
-    }
-
-    .queue-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0 0 6px;
-      overflow-wrap: anywhere;
-    }
-
-    .queue-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .queue-badges {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .badge {
-      border-radius: 999px;
-      padding: 5px 8px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      color: #213033;
-      background: #eef2ee;
-      border: 1px solid #d8dfda;
-    }
-
-    .badge.status-new {
-      background: var(--accent-soft);
-      border-color: #e8c5ac;
-      color: #5e2f17;
-    }
-
-    .badge.status-in-progress {
-      background: #fff1ca;
-      border-color: #edd584;
-      color: var(--warning);
-    }
-
-    .badge.status-complete {
-      background: #e1f0e5;
-      border-color: #b8d9c3;
-      color: var(--success);
-    }
-
-    .badge.type {
-      background: var(--primary-soft);
-      border-color: #bdd7ce;
-      color: #1e554b;
-    }
-
-    .queue-details {
-      border-top: 1px solid var(--line);
-      padding: 0 14px 14px;
-    }
-
-    details {
-      margin-top: 12px;
-    }
-
-    summary {
-      cursor: pointer;
-      color: var(--primary);
-      font-weight: 700;
-      min-height: 34px;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .detail-row {
-      border: 1px solid #e4e9e5;
-      border-radius: 6px;
-      padding: 8px;
-      background: #fbfcfb;
-      min-width: 0;
-    }
-
-    .detail-row.full {
-      grid-column: 1 / -1;
-    }
-
-    .queue-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 0 14px 14px;
-    }
-
-    .mini-btn {
-      min-height: 34px;
-      padding: 7px 10px;
-      font-size: 13px;
-    }
-
-    .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      max-width: min(420px, calc(100vw - 36px));
-      background: #172122;
-      color: #ffffff;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 12px 14px;
-      transform: translateY(16px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 160ms ease, transform 160ms ease;
-      z-index: 10;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 1120px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 760px) {
-      .header-inner {
-        width: min(100% - 20px, 1420px);
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      main {
-        width: min(100% - 20px, 1420px);
-        padding-top: 16px;
-      }
-
-      .type-options,
-      .form-grid,
-      .vendor-panel,
-      .vendor-details,
-      .detail-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .field.full,
-      .vendor-details,
-      .detail-row.full {
-        grid-column: auto;
-      }
-
-      .section-header,
-      .queue-tools,
-      .actions {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .left-actions,
-      .right-actions,
-      .filter-group {
-        width: 100%;
-      }
-
-      .btn,
-      .filter-group select,
-      .filter-group input {
-        width: 100%;
-      }
-
-      .queue-item-head {
-        grid-template-columns: 1fr;
-      }
-
-      .queue-badges {
-        justify-content: flex-start;
-      }
-    }
+:root {
+  color-scheme: light;
+  --bg: #f5f6f3;
+  --surface: #ffffff;
+  --surface-strong: #f0f4f1;
+  --ink: #1d2324;
+  --muted: #647071;
+  --line: #d8dfda;
+  --field: #fbfcfb;
+  --primary: #23675a;
+  --primary-ink: #ffffff;
+  --primary-soft: #dcece6;
+  --accent: #a8562a;
+  --accent-soft: #f4e4d7;
+  --danger: #b3261e;
+  --warning: #8a6200;
+  --success: #1f6d3d;
+  --shadow: 0 18px 45px rgba(27, 35, 36, 0.09);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden],
+.netlify-bot-field {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+header {
+  background: #172122;
+  color: #ffffff;
+  border-bottom: 4px solid var(--accent);
+}
+
+.header-inner {
+  width: min(1420px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.header-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  color: #d5dcda;
+  font-size: 14px;
+}
+
+.meta-pill {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+main {
+  width: min(1420px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 36px;
+  display: grid;
+  grid-template-columns: minmax(430px, 0.95fr) minmax(460px, 1.05fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.success-main {
+  display: block;
+  max-width: 720px;
+}
+
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.count-badge {
+  min-width: 34px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-ink);
+  font-weight: 700;
+  padding: 4px 10px;
+}
+
+form {
+  padding: 20px;
+}
+
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 22px;
+}
+
+legend {
+  width: 100%;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.type-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.type-option {
+  position: relative;
+  display: block;
+}
+
+.type-option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.type-label {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.type-title {
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.type-key {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.type-option input:focus-visible + .type-label,
+.type-option input:checked + .type-label {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: #153d37;
+  outline: 2px solid transparent;
+}
+
+.type-option input:disabled + .type-label {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.type-option input:checked + .type-label {
+  cursor: default;
+  opacity: 1;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.checkbox-field {
+  justify-content: flex-end;
+}
+
+label {
+  font-weight: 700;
+  color: #273032;
+  font-size: 14px;
+}
+
+.required {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #cbd4ce;
+  border-radius: 6px;
+  background: var(--field);
+  color: var(--ink);
+  padding: 9px 10px;
+  outline: 0;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  min-height: 18px;
+  padding: 0;
+  accent-color: var(--primary);
+}
+
+.checkbox-option {
+  min-height: 42px;
+  border: 1px solid #cbd4ce;
+  border-radius: 6px;
+  background: var(--field);
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-option:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(35, 103, 90, 0.18);
+  background: #ffffff;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(35, 103, 90, 0.18);
+  background: #ffffff;
+}
+
+.supplier-section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf8;
+  padding: 14px;
+}
+
+.supplier-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.supplier-section h3 {
+  margin: 0;
+  color: #273032;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.supplier-list {
+  display: grid;
+  gap: 12px;
+}
+
+.icon-btn {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border: 1px solid #b9c5be;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  background: #f2f5f2;
+}
+
+.icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.detail-label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.left-actions,
+.right-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn {
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 9px 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+.btn-primary:hover {
+  background: #1d574c;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  border-color: #b9c5be;
+  color: #263032;
+}
+
+.btn-secondary:hover {
+  background: #f2f5f2;
+}
+
+.btn-danger {
+  background: #ffffff;
+  border-color: #e0b1ad;
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: #fff3f1;
+}
+
+.queue-tools {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+}
+
+.filter-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group select,
+.filter-group input {
+  width: auto;
+  min-width: 160px;
+}
+
+.queue-list {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px 20px;
+}
+
+.queue-empty {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed #c4cec7;
+  border-radius: 8px;
+  background: #fbfcfb;
+  padding: 22px;
+}
+
+.queue-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.queue-item-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border-left: 5px solid var(--primary);
+}
+
+.queue-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+
+.queue-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.queue-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #213033;
+  background: #eef2ee;
+  border: 1px solid #d8dfda;
+}
+
+.badge.status-new {
+  background: var(--accent-soft);
+  border-color: #e8c5ac;
+  color: #5e2f17;
+}
+
+.badge.status-in-progress {
+  background: #fff1ca;
+  border-color: #edd584;
+  color: var(--warning);
+}
+
+.badge.status-complete {
+  background: #e1f0e5;
+  border-color: #b8d9c3;
+  color: var(--success);
+}
+
+.badge.type {
+  background: var(--primary-soft);
+  border-color: #bdd7ce;
+  color: #1e554b;
+}
+
+.queue-details {
+  border-top: 1px solid var(--line);
+  padding: 0 14px 14px;
+}
+
+details {
+  margin-top: 12px;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 700;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.detail-row {
+  border: 1px solid #e4e9e5;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fbfcfb;
+  min-width: 0;
+}
+
+.detail-row.full {
+  grid-column: 1 / -1;
+}
+
+.queue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.mini-btn {
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+.success-body {
+  padding: 22px 20px 24px;
+}
+
+.success-body p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  max-width: min(420px, calc(100vw - 36px));
+  background: #172122;
+  color: #ffffff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  transform: translateY(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  z-index: 10;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1120px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .header-inner {
+    width: min(100% - 20px, 1420px);
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  main {
+    width: min(100% - 20px, 1420px);
+    padding-top: 16px;
+  }
+
+  .type-options,
+  .form-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field.full,
+  .detail-row.full {
+    grid-column: auto;
+  }
+
+  .section-header,
+  .queue-tools,
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .left-actions,
+  .right-actions,
+  .filter-group {
+    width: 100%;
+  }
+
+  .btn,
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+  }
+
+  .queue-item-head {
+    grid-template-columns: 1fr;
+  }
+
+  .queue-badges {
+    justify-content: flex-start;
+  }
+}
+
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header>
-      <div class="header-inner">
-        <h1>Deltek Intake Form</h1>
-        <div class="header-meta" aria-label="Queue summary">
-          <span class="meta-pill" id="newCount">New: 0</span>
-          <span class="meta-pill" id="progressCount">In Progress: 0</span>
-          <span class="meta-pill" id="completeCount">Complete: 0</span>
-        </div>
+  
+
+
+<div class="app-shell" data-intake-app>
+  <header>
+    <div class="header-inner">
+      <h1>Deltek Intake Form</h1>
+      <div class="header-meta" aria-label="Queue summary">
+        <span class="meta-pill" id="newCount">New: 0</span>
+        <span class="meta-pill" id="progressCount">In Progress: 0</span>
+        <span class="meta-pill" id="completeCount">Complete: 0</span>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main>
-      <section class="surface" aria-labelledby="intakeHeading">
-        <div class="section-header">
-          <h2 id="intakeHeading">Intake</h2>
-        </div>
+  <main>
+    <section class="surface" aria-labelledby="intakeHeading">
+      <div class="section-header">
+        <h2 id="intakeHeading">Intake</h2>
+      </div>
 
-        <form id="intakeForm" novalidate>
-          <fieldset>
-            <legend>Request Type</legend>
-            <div class="type-options" id="typeOptions"></div>
-          </fieldset>
+      <form
+        id="intakeForm"
+        name="deltek-intake"
+        method="POST"
+        action="/success/"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        novalidate
+      >
+        <input type="hidden" name="form-name" value="deltek-intake">
+        <input type="hidden" id="requestId" name="requestId">
+        <input type="hidden" id="createdAt" name="createdAt">
+        <input type="hidden" name="queueStatus" value="New">
+        <p class="netlify-bot-field">
+          <label>Do not fill this out: <input name="bot-field"></label>
+        </p>
 
-          <fieldset id="commonFieldset" hidden>
-            <legend>Request Details</legend>
-            <div class="form-grid" id="commonFields"></div>
-          </fieldset>
-
-          <fieldset id="specificFieldset" hidden>
-            <legend id="specificLegend">Required Information</legend>
-            <div class="form-grid" id="specificFields"></div>
-          </fieldset>
-
-          <fieldset id="vendorFieldset" hidden>
-            <legend>Vendor Lookup</legend>
-            <div class="vendor-panel">
-              <div class="field">
-                <label for="vendorSearch">Vendor search</label>
-                <input id="vendorSearch" name="vendorSearch" type="search" autocomplete="off">
-              </div>
-              <div class="field">
-                <label for="vendorId">Vendor <span class="required">*</span></label>
-                <select id="vendorId" name="vendorId"></select>
-              </div>
-              <div class="vendor-details" id="vendorDetails" aria-live="polite"></div>
-            </div>
-          </fieldset>
-
-          <div class="actions" id="formActions">
-            <div class="left-actions" id="requestActions" hidden>
-              <button type="submit" class="btn btn-primary">Add to Queue</button>
-              <button type="button" class="btn btn-secondary" id="resetForm">Reset Form</button>
-            </div>
-            <div class="right-actions">
-              <button type="button" class="btn btn-secondary" id="fillSample">Sample Data</button>
-            </div>
+        <fieldset>
+          <legend>Request Type</legend>
+          <div class="type-options">
+            
+              <label class="type-option">
+                <input type="radio" name="requestType" value="Opportunity" required data-type-radio>
+                <span class="type-label">
+                  <span class="type-title">Opportunity</span>
+                  <span class="type-key">OPP</span>
+                </span>
+              </label>
+            
+              <label class="type-option">
+                <input type="radio" name="requestType" value="Project" required data-type-radio>
+                <span class="type-label">
+                  <span class="type-title">Project</span>
+                  <span class="type-key">PRJ</span>
+                </span>
+              </label>
+            
+              <label class="type-option">
+                <input type="radio" name="requestType" value="Supplier PO" required data-type-radio>
+                <span class="type-label">
+                  <span class="type-title">Supplier PO</span>
+                  <span class="type-key">PO</span>
+                </span>
+              </label>
+            
           </div>
-        </form>
-      </section>
+        </fieldset>
 
-      <section class="surface" aria-labelledby="queueHeading">
-        <div class="section-header">
-          <h2 id="queueHeading">Work Queue</h2>
-          <span class="count-badge" id="queueCount">0</span>
-        </div>
-
-        <div class="queue-tools">
-          <div class="filter-group">
-            <label for="queueStatusFilter">Status</label>
-            <select id="queueStatusFilter">
-              <option value="All">All</option>
-              <option value="New">New</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Complete">Complete</option>
-            </select>
-            <label for="queueTypeFilter">Type</label>
-            <select id="queueTypeFilter">
-              <option value="All">All</option>
-              <option value="Opportunity">Opportunity</option>
-              <option value="Promo">Promo</option>
-              <option value="Project">Project</option>
-              <option value="Supplier PO">Supplier PO</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <button type="button" class="btn btn-secondary" id="exportQueue">Export CSV</button>
-            <button type="button" class="btn btn-danger" id="clearComplete">Clear Complete</button>
-          </div>
-        </div>
-
-        <div class="queue-list" id="queueList"></div>
-      </section>
-    </main>
+        
+          
+            <fieldset class="specific-fieldset" data-type-panel="Opportunity" hidden disabled>
+              <legend>Opportunity Setup</legend>
+              <div class="form-grid">
+                
+                  
+  <div
+    class="field full checkbox-field"
+    
+  >
+    
+      <input type="hidden" name="opportunityCreatePromoProject" value="No">
+      <label class="checkbox-option" for="opportunityCreatePromoProject">
+        <input
+          id="opportunityCreatePromoProject"
+          name="opportunityCreatePromoProject"
+          type="checkbox"
+          value="Yes"
+          
+          checked
+        >
+        <span>Create a promo project?</span>
+      </label>
+    
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+                
+              </div>
+            </fieldset>
+          
+        
+          
+            <fieldset class="specific-fieldset" data-type-panel="Project" hidden disabled>
+              <legend>Project Setup</legend>
+              <div class="form-grid">
+                
+                  
+  <div
+    class="field full checkbox-field"
+    
+  >
+    
+      <input type="hidden" name="projectCreatePromoProject" value="No">
+      <label class="checkbox-option" for="projectCreatePromoProject">
+        <input
+          id="projectCreatePromoProject"
+          name="projectCreatePromoProject"
+          type="checkbox"
+          value="Yes"
+          
+          checked
+        >
+        <span>Create a promo project?</span>
+      </label>
+    
+  </div>
 
-  <script>
-    const intakeTypes = [
-      { key: "Opportunity", short: "OPP" },
-      { key: "Promo", short: "PRM" },
-      { key: "Project", short: "PRJ" },
-      { key: "Supplier PO", short: "PO" }
-    ];
+                
+              </div>
+            </fieldset>
+          
+        
+          
+        
 
-    const vendors = [
-      { id: "V-10014", name: "Acme Promotional Products", category: "Promotional", contact: "orders@acmepromo.example", terms: "Net 30", status: "Active" },
-      { id: "V-10208", name: "Brightline Print Services", category: "Print", contact: "accounting@brightline.example", terms: "Net 15", status: "Active" },
-      { id: "V-10442", name: "Compass Office Supply", category: "Office Supply", contact: "support@compass.example", terms: "Net 30", status: "Active" },
-      { id: "V-10719", name: "Northstar Technical Staffing", category: "Professional Services", contact: "deltek@northstar.example", terms: "Net 45", status: "Active" },
-      { id: "V-11063", name: "Summit Hardware and Safety", category: "Materials", contact: "sales@summiths.example", terms: "Net 30", status: "Active" },
-      { id: "V-11501", name: "Keystone Logistics", category: "Freight", contact: "dispatch@keystone.example", terms: "Net 20", status: "Active" },
-      { id: "V-11877", name: "Harbor Event Rentals", category: "Events", contact: "team@harborrentals.example", terms: "Due on receipt", status: "Active" },
-      { id: "V-12005", name: "Pinnacle Software Group", category: "Software", contact: "billing@pinnaclesg.example", terms: "Annual", status: "Active" }
-    ];
+        <fieldset id="commonFieldset" hidden disabled>
+          <legend>Request Details</legend>
+          <div class="form-grid">
+            
+              
+  <div
+    class="field full"
+    
+  >
+    
+      <label for="requestTitle">Title of Request <span class="required">*</span></label>
+    
+      <input
+        id="requestTitle"
+        name="requestTitle"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
 
-    // Populate these lookup lists from Deltek exports when available.
-    const employeeList = [];
-    const deltekClients = [];
-    const internalOrganizations = ["Tandem DET", "Tandem CAN", "Baird AE", "A3C"];
-    const probabilityOptions = ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"];
+            
+              
+  <div
+    class="field"
+    
+  >
+    
+      <label for="projectManager">Project Manager <span class="required">*</span></label>
+    
+      <input
+        id="projectManager"
+        name="projectManager"
+        type="text"
+        list="projectManagerOptions"
+        autocomplete="off"
+        required
+      >
+      <datalist id="projectManagerOptions">
+        
+          <option value="Jordan Lee"></option>
+        
+          <option value="Casey Rivera"></option>
+        
+      </datalist>
+    
+    
+  </div>
 
-    const commonFields = [
-      { name: "requestTitle", label: "Title of Request", type: "text", required: true, full: true },
-      { name: "projectManager", label: "Project Manager", type: "lookup", required: true, options: employeeList },
-      { name: "managingPrincipal", label: "Managing Principal", type: "lookup", required: true, options: employeeList },
-      { name: "organization", label: "Organization", type: "select", required: true, options: internalOrganizations },
-      { name: "estimatedStartDate", label: "Estimated Start Date", type: "date", required: true },
-      { name: "estimatedFinishDate", label: "Estimated finish date", type: "date", required: true }
-    ];
+            
+              
+  <div
+    class="field"
+    
+  >
+    
+      <label for="managingPrincipal">Managing Principal <span class="required">*</span></label>
+    
+      <input
+        id="managingPrincipal"
+        name="managingPrincipal"
+        type="text"
+        list="managingPrincipalOptions"
+        autocomplete="off"
+        required
+      >
+      <datalist id="managingPrincipalOptions">
+        
+          <option value="Taylor Morgan"></option>
+        
+      </datalist>
+    
+    
+  </div>
 
-    const specificFields = {
-      "Opportunity": [
-        { name: "opportunityName", label: "Opportunity name", type: "text", required: true },
-        { name: "estimatedRevenue", label: "Est Revenue", type: "number", required: true, min: "0", step: "0.01" },
-        { name: "probability", label: "Probability", type: "select", required: true, options: probabilityOptions },
-        { name: "stage", label: "Stage", type: "select", required: true, options: ["preproposal", "proposal", "bid", "award", "pre-award"] },
-        { name: "engineeringCategory", label: "Engineering category", type: "select", required: true, options: ["industrial", "automotive", "electrical", "mechanical", "structural", "conveyor", "controls"] },
-        { name: "source", label: "Source", type: "select", required: true, options: ["Tradeshow", "bid", "government", "marketing", "other"] },
-        { name: "primaryClient", label: "Primary client", type: "lookup", required: true, options: deltekClients }
-      ],
-      "Promo": [
-        { name: "campaignName", label: "Campaign or event", type: "text", required: true },
-        { name: "itemDescription", label: "Item description", type: "text", required: true },
-        { name: "quantity", label: "Quantity", type: "number", required: true, min: "1", step: "1" },
-        { name: "inHandsDate", label: "In-hands date", type: "date", required: true },
-        { name: "budget", label: "Budget", type: "number", required: true, min: "0", step: "0.01" },
-        { name: "shipTo", label: "Ship to", type: "text", required: true, full: true }
-      ],
-      "Project": [
-        { name: "projectName", label: "Project name", type: "text", required: true },
-        { name: "clientName", label: "Client", type: "text", required: true },
-        { name: "projectCode", label: "Project or charge code", type: "text", required: true },
-        { name: "contractType", label: "Contract type", type: "select", required: true, options: ["Firm Fixed Price", "Time and Materials", "Cost Plus", "Internal"] }
-      ],
-      "Supplier PO": [
-        { name: "poDescription", label: "PO description", type: "text", required: true, full: true },
-        { name: "amount", label: "Amount", type: "number", required: true, min: "0", step: "0.01" },
-        { name: "buyer", label: "Buyer", type: "text", required: true },
-        { name: "deliveryDate", label: "Delivery date", type: "date", required: true },
-        { name: "deliverTo", label: "Deliver to", type: "text", required: true },
-        { name: "glOrProjectCode", label: "GL or project code", type: "text", required: true }
-      ]
+            
+              
+  <div
+    class="field"
+    
+  >
+    
+      <label for="organization">Organization <span class="required">*</span></label>
+    
+      <select id="organization" name="organization" required>
+        <option value="">Select organization</option>
+        
+          <option value="Tandem DET">Tandem DET</option>
+        
+          <option value="Tandem CAN">Tandem CAN</option>
+        
+          <option value="Baird AE">Baird AE</option>
+        
+          <option value="A3C">A3C</option>
+        
+      </select>
+    
+    
+  </div>
+
+            
+              
+  <div
+    class="field"
+    data-show-for="Opportunity,Project"
+  >
+    
+      <label for="estimatedStartDate">Estimated Start Date <span class="required">*</span></label>
+    
+      <input
+        id="estimatedStartDate"
+        name="estimatedStartDate"
+        type="date"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+            
+              
+  <div
+    class="field"
+    data-show-for="Opportunity,Project"
+  >
+    
+      <label for="estimatedFinishDate">Estimated finish date <span class="required">*</span></label>
+    
+      <input
+        id="estimatedFinishDate"
+        name="estimatedFinishDate"
+        type="date"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+            
+          </div>
+        </fieldset>
+
+        
+          <fieldset class="specific-fieldset" data-type-panel="Opportunity" hidden disabled>
+            <legend>Opportunity Required Information</legend>
+            <div class="form-grid">
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="opportunityName">Opportunity name <span class="required">*</span></label>
+    
+      <input
+        id="opportunityName"
+        name="opportunityName"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="estimatedRevenue">Est Revenue <span class="required">*</span></label>
+    
+      <input
+        id="estimatedRevenue"
+        name="estimatedRevenue"
+        type="number"
+        required
+        min="0"
+        step="0.01"
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="probability">Probability <span class="required">*</span></label>
+    
+      <select id="probability" name="probability" required>
+        <option value="">Select probability</option>
+        
+          <option value="0%">0%</option>
+        
+          <option value="10%">10%</option>
+        
+          <option value="20%">20%</option>
+        
+          <option value="30%">30%</option>
+        
+          <option value="40%">40%</option>
+        
+          <option value="50%">50%</option>
+        
+          <option value="60%">60%</option>
+        
+          <option value="70%">70%</option>
+        
+          <option value="80%">80%</option>
+        
+          <option value="90%">90%</option>
+        
+          <option value="100%">100%</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="stage">Stage <span class="required">*</span></label>
+    
+      <select id="stage" name="stage" required>
+        <option value="">Select stage</option>
+        
+          <option value="preproposal">preproposal</option>
+        
+          <option value="proposal">proposal</option>
+        
+          <option value="bid">bid</option>
+        
+          <option value="award">award</option>
+        
+          <option value="pre-award">pre-award</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="engineeringCategory">Engineering category <span class="required">*</span></label>
+    
+      <select id="engineeringCategory" name="engineeringCategory" required>
+        <option value="">Select engineering category</option>
+        
+          <option value="industrial">industrial</option>
+        
+          <option value="automotive">automotive</option>
+        
+          <option value="electrical">electrical</option>
+        
+          <option value="mechanical">mechanical</option>
+        
+          <option value="structural">structural</option>
+        
+          <option value="conveyor">conveyor</option>
+        
+          <option value="controls">controls</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="source">Source <span class="required">*</span></label>
+    
+      <select id="source" name="source" required>
+        <option value="">Select source</option>
+        
+          <option value="Tradeshow">Tradeshow</option>
+        
+          <option value="bid">bid</option>
+        
+          <option value="government">government</option>
+        
+          <option value="marketing">marketing</option>
+        
+          <option value="other">other</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="primaryClient">Primary client <span class="required">*</span></label>
+    
+      <input
+        id="primaryClient"
+        name="primaryClient"
+        type="text"
+        list="primaryClientOptions"
+        autocomplete="off"
+        required
+      >
+      <datalist id="primaryClientOptions">
+        
+          <option value="Atlas Manufacturing"></option>
+        
+          <option value="North Plant Operations"></option>
+        
+          <option value="River City Packaging"></option>
+        
+      </datalist>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="mainContactName">Main contact name <span class="required">*</span></label>
+    
+      <input
+        id="mainContactName"
+        name="mainContactName"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="mainContactPhone">Main contact phone <span class="required">*</span></label>
+    
+      <input
+        id="mainContactPhone"
+        name="mainContactPhone"
+        type="tel"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+              
+            </div>
+          </fieldset>
+        
+          <fieldset class="specific-fieldset" data-type-panel="Project" hidden disabled>
+            <legend>Project Required Information</legend>
+            <div class="form-grid">
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="projectName">Project name <span class="required">*</span></label>
+    
+      <input
+        id="projectName"
+        name="projectName"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="clientName">Client <span class="required">*</span></label>
+    
+      <input
+        id="clientName"
+        name="clientName"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="contractType">Contract type <span class="required">*</span></label>
+    
+      <select id="contractType" name="contractType" required>
+        <option value="">Select contract type</option>
+        
+          <option value="Firm Fixed Price">Firm Fixed Price</option>
+        
+          <option value="Time and Materials">Time and Materials</option>
+        
+          <option value="Cost Plus">Cost Plus</option>
+        
+          <option value="Internal">Internal</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="supplierMarkupRate">Supplier markup rate <span class="required">*</span></label>
+    
+      <select id="supplierMarkupRate" name="supplierMarkupRate" required>
+        <option value="">Select supplier markup rate</option>
+        
+          <option value="10%">10%</option>
+        
+          <option value="11%">11%</option>
+        
+          <option value="12%">12%</option>
+        
+          <option value="13%">13%</option>
+        
+          <option value="14%">14%</option>
+        
+          <option value="15%">15%</option>
+        
+          <option value="16%">16%</option>
+        
+          <option value="17%">17%</option>
+        
+          <option value="18%">18%</option>
+        
+          <option value="19%">19%</option>
+        
+          <option value="20%">20%</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+              
+                <div class="supplier-section full" data-supplier-section>
+                  <div class="supplier-section-head">
+                    <h3>Suppliers</h3>
+                    <button type="button" class="icon-btn" id="addSupplier" aria-label="Add supplier">+</button>
+                  </div>
+                  <div class="supplier-list">
+                    
+                      <div class="supplier-row" data-supplier-row>
+                        <div class="field">
+                          <label for="supplier1">Supplier 1</label>
+                          <input
+                            id="supplier1"
+                            name="supplier1"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier2">Supplier 2</label>
+                          <input
+                            id="supplier2"
+                            name="supplier2"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier3">Supplier 3</label>
+                          <input
+                            id="supplier3"
+                            name="supplier3"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier4">Supplier 4</label>
+                          <input
+                            id="supplier4"
+                            name="supplier4"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier5">Supplier 5</label>
+                          <input
+                            id="supplier5"
+                            name="supplier5"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier6">Supplier 6</label>
+                          <input
+                            id="supplier6"
+                            name="supplier6"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier7">Supplier 7</label>
+                          <input
+                            id="supplier7"
+                            name="supplier7"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier8">Supplier 8</label>
+                          <input
+                            id="supplier8"
+                            name="supplier8"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier9">Supplier 9</label>
+                          <input
+                            id="supplier9"
+                            name="supplier9"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                      <div class="supplier-row" data-supplier-row hidden>
+                        <div class="field">
+                          <label for="supplier10">Supplier 10</label>
+                          <input
+                            id="supplier10"
+                            name="supplier10"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            disabled
+                          >
+                        </div>
+                      </div>
+                    
+                  </div>
+                  <datalist id="supplierOptions">
+                    
+                      <option value="Acme Promotional Products"></option>
+                    
+                      <option value="Brightline Print Services"></option>
+                    
+                      <option value="Compass Office Supply"></option>
+                    
+                      <option value="Northstar Technical Staffing"></option>
+                    
+                      <option value="Summit Hardware and Safety"></option>
+                    
+                      <option value="Keystone Logistics"></option>
+                    
+                      <option value="Harbor Event Rentals"></option>
+                    
+                      <option value="Pinnacle Software Group"></option>
+                    
+                  </datalist>
+                </div>
+              
+            </div>
+          </fieldset>
+        
+          <fieldset class="specific-fieldset" data-type-panel="Supplier PO" hidden disabled>
+            <legend>Supplier PO Required Information</legend>
+            <div class="form-grid">
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="supplier">Supplier <span class="required">*</span></label>
+    
+      <select id="supplier" name="supplier" required>
+        <option value="">Select supplier</option>
+        
+          <option value="Acme Promotional Products (V-10014)">Acme Promotional Products (V-10014)</option>
+        
+          <option value="Brightline Print Services (V-10208)">Brightline Print Services (V-10208)</option>
+        
+          <option value="Compass Office Supply (V-10442)">Compass Office Supply (V-10442)</option>
+        
+          <option value="Northstar Technical Staffing (V-10719)">Northstar Technical Staffing (V-10719)</option>
+        
+          <option value="Summit Hardware and Safety (V-11063)">Summit Hardware and Safety (V-11063)</option>
+        
+          <option value="Keystone Logistics (V-11501)">Keystone Logistics (V-11501)</option>
+        
+          <option value="Harbor Event Rentals (V-11877)">Harbor Event Rentals (V-11877)</option>
+        
+          <option value="Pinnacle Software Group (V-12005)">Pinnacle Software Group (V-12005)</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field full"
+    
+  >
+    
+      <label for="poDescription">Description of PO <span class="required">*</span></label>
+    
+      <textarea id="poDescription" name="poDescription" required></textarea>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="amount">Amount <span class="required">*</span></label>
+    
+      <input
+        id="amount"
+        name="amount"
+        type="number"
+        required
+        min="0"
+        step="0.01"
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="paymentTerms">Payment terms <span class="required">*</span></label>
+    
+      <select id="paymentTerms" name="paymentTerms" required>
+        <option value="">Select payment terms</option>
+        
+          <option value="Net 30">Net 30</option>
+        
+          <option value="Net 45">Net 45</option>
+        
+          <option value="Net 90">Net 90</option>
+        
+          <option value="Pay when paid">Pay when paid</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="mainContact">Main contact <span class="required">*</span></label>
+    
+      <input
+        id="mainContact"
+        name="mainContact"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="deliveryDate">Delivery date <span class="required">*</span></label>
+    
+      <input
+        id="deliveryDate"
+        name="deliveryDate"
+        type="date"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="deliverTo">Deliver to <span class="required">*</span></label>
+    
+      <input
+        id="deliverTo"
+        name="deliverTo"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    
+  >
+    
+      <label for="glOrProjectCode">GL or project code <span class="required">*</span></label>
+    
+      <input
+        id="glOrProjectCode"
+        name="glOrProjectCode"
+        type="text"
+        required
+        
+        
+      >
+    
+    
+  </div>
+
+              
+              
+            </div>
+          </fieldset>
+        
+
+        <div class="actions" id="formActions">
+          <div class="left-actions" id="requestActions" hidden>
+            <button type="submit" class="btn btn-primary">Submit Intake</button>
+            <button type="button" class="btn btn-secondary" id="resetForm">Reset Form</button>
+          </div>
+          <div class="right-actions">
+            <button type="button" class="btn btn-secondary" id="fillSample">Sample Data</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="surface" aria-labelledby="queueHeading">
+      <div class="section-header">
+        <h2 id="queueHeading">Work Queue</h2>
+        <span class="count-badge" id="queueCount">0</span>
+      </div>
+
+      <div class="queue-tools">
+        <div class="filter-group">
+          <label for="queueStatusFilter">Status</label>
+          <select id="queueStatusFilter">
+            <option value="All">All</option>
+            <option value="New">New</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Complete">Complete</option>
+          </select>
+          <label for="queueTypeFilter">Type</label>
+          <select id="queueTypeFilter">
+            <option value="All">All</option>
+            
+              <option value="Opportunity">Opportunity</option>
+            
+              <option value="Project">Project</option>
+            
+              <option value="Supplier PO">Supplier PO</option>
+            
+          </select>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="btn btn-secondary" id="exportQueue">Export CSV</button>
+          <button type="button" class="btn btn-danger" id="clearComplete">Clear Complete</button>
+        </div>
+      </div>
+
+      <div class="queue-list" id="queueList"></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  
+    <script>
+(function () {
+  const app = document.querySelector("[data-intake-app]");
+  if (!app) return;
+
+  const form = document.getElementById("intakeForm");
+  const commonFieldset = document.getElementById("commonFieldset");
+  const requestActions = document.getElementById("requestActions");
+  const requestIdInput = document.getElementById("requestId");
+  const createdAtInput = document.getElementById("createdAt");
+  const queueList = document.getElementById("queueList");
+  const queueCount = document.getElementById("queueCount");
+  const queueStatusFilter = document.getElementById("queueStatusFilter");
+  const queueTypeFilter = document.getElementById("queueTypeFilter");
+  const fillSampleButton = document.getElementById("fillSample");
+  const toast = document.getElementById("toast");
+  const addSupplierButton = document.getElementById("addSupplier");
+  const supplierRows = Array.from(document.querySelectorAll("[data-supplier-row]"));
+  const typeScopedFields = Array.from(document.querySelectorAll("[data-show-for]"));
+
+  const storageKey = "deltek-intake-queue-v2";
+  const legacyStorageKeys = ["deltek-intake-queue-v1"];
+
+  let selectedType = "";
+  let queue = loadQueue();
+  let toastTimer = null;
+
+  initialize();
+
+  function initialize() {
+    form.addEventListener("change", handleFormChange);
+    form.addEventListener("submit", handleSubmit);
+
+    document.getElementById("resetForm").addEventListener("click", () => {
+      resetIntakeForm();
+    });
+    fillSampleButton.addEventListener("click", fillSampleData);
+    if (addSupplierButton) addSupplierButton.addEventListener("click", addSupplierRow);
+    queueStatusFilter.addEventListener("change", renderQueue);
+    queueTypeFilter.addEventListener("change", renderQueue);
+    document.getElementById("exportQueue").addEventListener("click", exportQueue);
+    document.getElementById("clearComplete").addEventListener("click", clearComplete);
+
+    setSelectedType("");
+    resetSupplierRows();
+    renderQueue();
+  }
+
+  function resetIntakeForm() {
+    form.reset();
+    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
+      radio.checked = false;
+    });
+    resetSupplierRows();
+    setSelectedType("");
+  }
+
+  function handleFormChange(event) {
+    if (event.target.matches("[data-type-radio]")) {
+      if (selectedType && event.target.value !== selectedType) {
+        event.target.checked = false;
+        return;
+      }
+
+      setSelectedType(event.target.value);
+    }
+  }
+
+  function setSelectedType(type) {
+    selectedType = type;
+    const hasType = Boolean(selectedType);
+
+    commonFieldset.hidden = !hasType;
+    commonFieldset.disabled = !hasType;
+    requestActions.hidden = !hasType;
+    fillSampleButton.hidden = !hasType;
+
+    document.querySelectorAll("[data-type-panel]").forEach((panel) => {
+      const isActive = panel.dataset.typePanel === selectedType;
+      panel.hidden = !isActive;
+      panel.disabled = !isActive;
+    });
+
+    updateTypeScopedFields();
+
+    if (selectedType !== "Project") {
+      resetSupplierRows();
+    }
+
+    if (!hasType) {
+      requestIdInput.value = "";
+      createdAtInput.value = "";
+    } else if (!requestIdInput.value) {
+      requestIdInput.value = createRequestId(selectedType);
+    }
+
+    updateTypeOptionsLock();
+    updateAddSupplierButton();
+  }
+
+  function updateTypeScopedFields() {
+    typeScopedFields.forEach((field) => {
+      const allowedTypes = field.dataset.showFor.split(",").filter(Boolean);
+      const isVisible = Boolean(selectedType) && allowedTypes.includes(selectedType);
+      field.hidden = !isVisible;
+      field.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.disabled = !isVisible;
+      });
+    });
+  }
+
+  function updateTypeOptionsLock() {
+    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
+      radio.disabled = Boolean(selectedType) && radio.value !== selectedType;
+    });
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const checkedType = form.querySelector("[data-type-radio]:checked");
+
+    if (!checkedType) {
+      showToast("Select a request type.");
+      return;
+    }
+
+    selectedType = checkedType.value;
+    createdAtInput.value = new Date().toISOString();
+    requestIdInput.value = requestIdInput.value || createRequestId(selectedType);
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formData = new FormData(form);
+    storeLocalQueueItem(formData);
+    renderQueue();
+    resetIntakeForm();
+    showToast("Request saved to the work queue.");
+    submitIntakeForm(formData);
+  }
+
+  function storeLocalQueueItem(formData) {
+    const details = Object.fromEntries(formData.entries());
+    const item = {
+      id: requestIdInput.value,
+      type: selectedType,
+      status: "New",
+      createdAt: createdAtInput.value,
+      details,
+      supplier: details.supplier || ""
     };
 
-    const typesRequiringVendor = new Set(["Promo", "Supplier PO"]);
-    const queueStorageKey = "deltek-intake-queue-v1";
-    const legacyQueueStorageKeys = ["deltek-intake-queue-v2"];
+    queue = queue.filter((existing) => existing.id !== item.id);
+    queue.unshift(item);
+    saveQueue();
+  }
 
-    const form = document.getElementById("intakeForm");
-    const typeOptions = document.getElementById("typeOptions");
-    const commonFieldset = document.getElementById("commonFieldset");
-    const commonFieldsContainer = document.getElementById("commonFields");
-    const specificFieldset = document.getElementById("specificFieldset");
-    const specificFieldsContainer = document.getElementById("specificFields");
-    const specificLegend = document.getElementById("specificLegend");
-    const requestActions = document.getElementById("requestActions");
-    const vendorFieldset = document.getElementById("vendorFieldset");
-    const vendorSearch = document.getElementById("vendorSearch");
-    const vendorSelect = document.getElementById("vendorId");
-    const vendorDetails = document.getElementById("vendorDetails");
-    const queueList = document.getElementById("queueList");
-    const queueCount = document.getElementById("queueCount");
-    const queueStatusFilter = document.getElementById("queueStatusFilter");
-    const queueTypeFilter = document.getElementById("queueTypeFilter");
-    const fillSampleButton = document.getElementById("fillSample");
-    const toast = document.getElementById("toast");
+  function submitIntakeForm(formData) {
+    if (window.location.protocol === "file:") return;
 
-    let selectedType = "";
-    let queue = loadQueue();
-    let toastTimer = null;
+    fetch(form.action, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString()
+    }).catch(() => {
+      showToast("Saved locally. Online submission did not complete.");
+    });
+  }
 
-    function initialize() {
-      renderTypeOptions();
-      renderFieldList(commonFields, commonFieldsContainer);
-      renderSpecificFields();
-      renderVendorOptions();
-      renderVendorDetails();
-      renderQueue();
-
-      form.addEventListener("submit", handleSubmit);
-      document.getElementById("resetForm").addEventListener("click", resetForm);
-      fillSampleButton.addEventListener("click", fillSampleData);
-      vendorSearch.addEventListener("input", renderVendorOptions);
-      vendorSelect.addEventListener("change", renderVendorDetails);
-      queueStatusFilter.addEventListener("change", renderQueue);
-      queueTypeFilter.addEventListener("change", renderQueue);
-      document.getElementById("exportQueue").addEventListener("click", exportQueue);
-      document.getElementById("clearComplete").addEventListener("click", clearComplete);
+  function fillSampleData() {
+    if (!selectedType) {
+      showToast("Select a request type before loading sample data.");
+      return;
     }
 
-    function renderTypeOptions() {
-      typeOptions.innerHTML = "";
-      intakeTypes.forEach((type) => {
-        const wrapper = document.createElement("label");
-        wrapper.className = "type-option";
+    const samples = getSampleData(selectedType);
+    if (!samples) return;
 
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = "intakeType";
-        input.value = type.key;
-        input.required = true;
-        input.checked = type.key === selectedType;
-        input.disabled = Boolean(selectedType) && type.key !== selectedType;
-        input.addEventListener("change", () => {
-          if (selectedType && selectedType !== type.key) return;
-          selectedType = type.key;
-          renderTypeOptions();
-          renderSpecificFields();
-        });
+    Object.entries(samples).forEach(([id, value]) => {
+      setValue(id, value);
+    });
+  }
 
-        const label = document.createElement("span");
-        label.className = "type-label";
-        label.innerHTML = `<span class="type-title">${escapeHtml(type.key)}</span><span class="type-key">${escapeHtml(type.short)}</span>`;
-
-        wrapper.append(input, label);
-        typeOptions.appendChild(wrapper);
-      });
-    }
-
-    function renderFieldList(fields, container) {
-      container.innerHTML = "";
-      fields.forEach((field) => {
-        container.appendChild(createField(field));
-      });
-    }
-
-    function createField(field) {
-      const wrapper = document.createElement("div");
-      wrapper.className = field.full ? "field full" : "field";
-
-      const label = document.createElement("label");
-      label.setAttribute("for", field.name);
-      label.innerHTML = `${escapeHtml(field.label)}${field.required ? ' <span class="required">*</span>' : ""}`;
-
-      let input;
-      let datalist = null;
-      if (field.type === "textarea") {
-        input = document.createElement("textarea");
-      } else if (field.type === "select") {
-        input = document.createElement("select");
-        const blankOption = document.createElement("option");
-        blankOption.value = "";
-        blankOption.textContent = `Select ${field.label.toLowerCase()}`;
-        input.appendChild(blankOption);
-        field.options.forEach((option) => {
-          const optionElement = document.createElement("option");
-          optionElement.value = option;
-          optionElement.textContent = option;
-          input.appendChild(optionElement);
-        });
-      } else if (field.type === "lookup") {
-        input = document.createElement("input");
-        input.type = "text";
-        input.setAttribute("list", `${field.name}Options`);
-        input.autocomplete = "off";
-
-        datalist = document.createElement("datalist");
-        datalist.id = `${field.name}Options`;
-        field.options.forEach((option) => {
-          const optionElement = document.createElement("option");
-          optionElement.value = option;
-          datalist.appendChild(optionElement);
-        });
-      } else {
-        input = document.createElement("input");
-        input.type = field.type;
-      }
-
-      input.id = field.name;
-      input.name = field.name;
-      input.required = Boolean(field.required);
-
-      if (field.min !== undefined) input.min = field.min;
-      if (field.step !== undefined) input.step = field.step;
-
-      wrapper.append(label, input);
-      if (datalist) wrapper.appendChild(datalist);
-      return wrapper;
-    }
-
-    function renderSpecificFields() {
-      if (!selectedType) {
-        commonFieldset.hidden = true;
-        specificFieldset.hidden = true;
-        vendorFieldset.hidden = true;
-        requestActions.hidden = true;
-        fillSampleButton.hidden = true;
-        vendorSelect.required = false;
-        specificFieldsContainer.innerHTML = "";
-        specificLegend.textContent = "Required Information";
-        return;
-      }
-
-      commonFieldset.hidden = false;
-      specificFieldset.hidden = false;
-      requestActions.hidden = false;
-      fillSampleButton.hidden = false;
-      specificLegend.textContent = `${selectedType} Required Information`;
-      renderFieldList(specificFields[selectedType], specificFieldsContainer);
-
-      const needsVendor = typesRequiringVendor.has(selectedType);
-      vendorFieldset.hidden = !needsVendor;
-      vendorSelect.required = needsVendor;
-      vendorSearch.value = "";
-      renderVendorOptions();
-      renderVendorDetails();
-    }
-
-    function renderVendorOptions() {
-      const searchTerm = vendorSearch.value.trim().toLowerCase();
-      const filteredVendors = vendors.filter((vendor) => {
-        return [vendor.id, vendor.name, vendor.category, vendor.contact].some((value) => {
-          return value.toLowerCase().includes(searchTerm);
-        });
-      });
-
-      const currentValue = vendorSelect.value;
-      vendorSelect.innerHTML = "";
-
-      const blankOption = document.createElement("option");
-      blankOption.value = "";
-      blankOption.textContent = "Select vendor";
-      vendorSelect.appendChild(blankOption);
-
-      filteredVendors.forEach((vendor) => {
-        const option = document.createElement("option");
-        option.value = vendor.id;
-        option.textContent = `${vendor.name} (${vendor.id})`;
-        vendorSelect.appendChild(option);
-      });
-
-      if (filteredVendors.some((vendor) => vendor.id === currentValue)) {
-        vendorSelect.value = currentValue;
-      }
-    }
-
-    function renderVendorDetails() {
-      const vendor = getSelectedVendor();
-      const detailData = vendor
-        ? [
-          ["Vendor ID", vendor.id],
-          ["Category", vendor.category],
-          ["Contact", vendor.contact],
-          ["Terms", vendor.terms]
-        ]
-        : [
-          ["Vendor ID", "-"],
-          ["Category", "-"],
-          ["Contact", "-"],
-          ["Terms", "-"]
-        ];
-
-      vendorDetails.innerHTML = detailData.map(([label, value]) => `
-        <div class="detail-box">
-          <span class="detail-label">${escapeHtml(label)}</span>
-          <span class="detail-value">${escapeHtml(value)}</span>
-        </div>
-      `).join("");
-    }
-
-    function handleSubmit(event) {
-      event.preventDefault();
-
-      if (!selectedType) {
-        showToast("Select a request type.");
-        return;
-      }
-
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      const formData = new FormData(form);
-      const vendor = getSelectedVendor();
-      const request = {
-        id: createId(selectedType),
-        type: selectedType,
-        status: "New",
-        createdAt: new Date().toISOString(),
-        vendor: vendor || null,
-        details: {}
-      };
-
-      [...commonFields, ...specificFields[selectedType]].forEach((field) => {
-        request.details[field.name] = formData.get(field.name) || "";
-      });
-
-      queue.unshift(request);
-      saveQueue();
-      renderQueue();
-      resetForm();
-      showToast("Request added to the work queue.");
-    }
-
-    function resetForm() {
-      form.reset();
-      selectedType = "";
-      renderTypeOptions();
-      renderSpecificFields();
-    }
-
-    function fillSampleData() {
-      if (!selectedType) {
-        showToast("Select a request type before loading sample data.");
-        return;
-      }
-
-      const samples = getSampleData(selectedType);
-      if (!samples) return;
-
-      Object.entries(samples).forEach(([id, value]) => {
-        setValue(id, value);
-      });
-      renderVendorDetails();
-    }
-
-    function getSampleData(type) {
-      const today = new Date();
-      const commonSample = {
-        requestTitle: {
-          Opportunity: "Automated inspection line pursuit",
-          Promo: "Safety week giveaway",
-          Project: "Packaging line controls upgrade",
-          "Supplier PO": "Safety equipment order"
-        }[type],
-        projectManager: "Jordan Lee",
-        managingPrincipal: "Taylor Morgan",
-        organization: "Tandem DET",
+  function getSampleData(type) {
+    const today = new Date();
+    const commonSample = {
+      requestTitle: {
+        Opportunity: "Automated inspection line pursuit",
+        Project: "Packaging line controls upgrade",
+        "Supplier PO": "Safety equipment order"
+      }[type],
+      projectManager: "Jordan Lee",
+      managingPrincipal: "Taylor Morgan",
+      organization: "Tandem DET",
+      ...(type === "Supplier PO" ? {} : {
         estimatedStartDate: formatDate(addDays(today, 10)),
         estimatedFinishDate: formatDate(addDays(today, 45))
-      };
+      })
+    };
 
-      const typeSamples = {
-        Opportunity: {
-          opportunityName: "North plant modernization",
-          estimatedRevenue: "125000.00",
-          probability: "70%",
-          stage: "proposal",
-          engineeringCategory: "controls",
-          source: "Tradeshow",
-          primaryClient: "Atlas Manufacturing"
-        },
-        Promo: {
-          vendorId: "V-10014",
-          campaignName: "Safety week giveaway",
-          itemDescription: "Branded high-visibility safety shirts",
-          quantity: "150",
-          inHandsDate: formatDate(addDays(today, 30)),
-          budget: "3200.00",
-          shipTo: "Richmond field office"
-        },
-        Project: {
-          projectName: "Packaging line controls upgrade",
-          clientName: "Atlas Manufacturing",
-          projectCode: "PRJ-4521",
-          contractType: "Time and Materials"
-        },
-        "Supplier PO": {
-          vendorId: "V-11063",
-          poDescription: "Replacement PPE and field safety supplies",
-          amount: "2850.00",
-          buyer: "Taylor Morgan",
-          deliveryDate: formatDate(addDays(today, 45)),
-          deliverTo: "Richmond field office",
-          glOrProjectCode: "OPS-4521"
-        }
-      };
-
-      const typeSample = typeSamples[type];
-      if (!typeSample) return null;
-
-      return {
-        ...commonSample,
-        ...typeSample
-      };
-    }
-
-    function setValue(id, value) {
-      const element = document.getElementById(id);
-      if (element) element.value = value;
-    }
-
-    function loadQueue() {
-      for (const key of [queueStorageKey, ...legacyQueueStorageKeys]) {
-        const storedQueue = readStoredQueue(localStorage, key) || readStoredQueue(sessionStorage, key);
-        if (storedQueue) return storedQueue;
+    const typeSamples = {
+      Opportunity: {
+        opportunityCreatePromoProject: "Yes",
+        opportunityName: "North plant modernization",
+        estimatedRevenue: "125000.00",
+        probability: "70%",
+        stage: "proposal",
+        engineeringCategory: "controls",
+        source: "Tradeshow",
+        primaryClient: "Atlas Manufacturing",
+        mainContactName: "Maya Chen",
+        mainContactPhone: "555-0142"
+      },
+      Project: {
+        projectCreatePromoProject: "Yes",
+        projectName: "Packaging line controls upgrade",
+        clientName: "Atlas Manufacturing",
+        contractType: "Time and Materials",
+        supplierMarkupRate: "15%",
+        supplier1: "Acme Promotional Products",
+        supplier2: "Midwest Industrial Supply"
+      },
+      "Supplier PO": {
+        supplier: "Summit Hardware and Safety (V-11063)",
+        poDescription: "Replacement PPE and field safety supplies",
+        amount: "2850.00",
+        paymentTerms: "Net 30",
+        mainContact: "Taylor Morgan",
+        deliveryDate: formatDate(addDays(today, 45)),
+        deliverTo: "Richmond field office",
+        glOrProjectCode: "OPS-4521"
       }
+    };
 
-      return [];
+    const typeSample = typeSamples[type];
+    if (!typeSample) return null;
+
+    return {
+      ...commonSample,
+      ...typeSample
+    };
+  }
+
+  function setValue(id, value) {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const supplierRow = element.closest("[data-supplier-row]");
+    if (supplierRow) {
+      showSupplierRow(supplierRow);
     }
 
-    function saveQueue() {
-      const serializedQueue = JSON.stringify(queue);
-      writeStoredQueue(localStorage, queueStorageKey, serializedQueue);
-      writeStoredQueue(sessionStorage, queueStorageKey, serializedQueue);
+    if (element.type === "checkbox") {
+      const normalizedValue = String(value).trim().toLowerCase();
+      element.checked = value === true || ["yes", "true", "1", "checked"].includes(normalizedValue);
+      return;
     }
 
-    function readStoredQueue(storage, key) {
-      try {
-        const stored = storage.getItem(key);
-        return stored ? JSON.parse(stored) : null;
-      } catch (error) {
-        return null;
-      }
-    }
+    element.value = value;
+  }
 
-    function writeStoredQueue(storage, key, value) {
-      try {
-        storage.setItem(key, value);
-      } catch (error) {
-        // The queue still works for the current page even if browser storage is unavailable.
-      }
-    }
+  function addSupplierRow() {
+    const nextRow = supplierRows.find((row) => row.hidden);
+    if (!nextRow) return;
 
-    function renderQueue() {
-      const statusFilter = queueStatusFilter.value;
-      const typeFilter = queueTypeFilter.value;
-      const filteredQueue = queue.filter((item) => {
-        const statusMatches = statusFilter === "All" || item.status === statusFilter;
-        const typeMatches = typeFilter === "All" || item.type === typeFilter;
-        return statusMatches && typeMatches;
+    showSupplierRow(nextRow);
+    const input = nextRow.querySelector("input");
+    if (input) input.focus();
+    updateAddSupplierButton();
+  }
+
+  function showSupplierRow(row) {
+    row.hidden = false;
+    row.querySelectorAll("input, select, textarea, button").forEach((control) => {
+      control.disabled = false;
+    });
+    updateAddSupplierButton();
+  }
+
+  function resetSupplierRows() {
+    supplierRows.forEach((row, index) => {
+      row.hidden = index > 0;
+      row.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.value = "";
+        control.disabled = index > 0;
       });
+    });
+    updateAddSupplierButton();
+  }
 
-      updateCounts();
-      queueCount.textContent = String(filteredQueue.length);
+  function updateAddSupplierButton() {
+    if (!addSupplierButton) return;
 
-      if (!filteredQueue.length) {
-        queueList.innerHTML = '<div class="queue-empty">No queue items match the current filters.</div>';
-        return;
-      }
+    const visibleCount = supplierRows.filter((row) => !row.hidden).length;
+    addSupplierButton.disabled = selectedType !== "Project" || visibleCount >= supplierRows.length;
+  }
 
-      queueList.innerHTML = filteredQueue.map(renderQueueItem).join("");
-
-      queueList.querySelectorAll("[data-action]").forEach((button) => {
-        button.addEventListener("click", handleQueueAction);
-      });
+  function loadQueue() {
+    for (const key of [storageKey, ...legacyStorageKeys]) {
+      const storedQueue = readStoredQueue(localStorage, key) || readStoredQueue(sessionStorage, key);
+      if (storedQueue) return storedQueue;
     }
 
-    function renderQueueItem(item) {
-      const title = item.details.requestTitle || `${item.type} request`;
-      const vendorLine = item.vendor ? `Vendor: ${item.vendor.name}` : "No vendor lookup";
-      const created = formatDateTime(item.createdAt);
-      const statusClass = `status-${item.status.toLowerCase().replaceAll(" ", "-")}`;
-      const detailRows = buildDetailRows(item);
+    return [];
+  }
 
-      return `
-        <article class="queue-item">
-          <div class="queue-item-head">
-            <div>
-              <h3 class="queue-title">${escapeHtml(title)}</h3>
-              <div class="queue-subtitle">${escapeHtml(item.id)} | ${escapeHtml(created)} | ${escapeHtml(vendorLine)}</div>
-            </div>
-            <div class="queue-badges">
-              <span class="badge type">${escapeHtml(item.type)}</span>
-              <span class="badge ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span>
-            </div>
-          </div>
-          <div class="queue-details">
-            <details>
-              <summary>Details</summary>
-              <div class="detail-grid">${detailRows}</div>
-            </details>
-          </div>
-          <div class="queue-actions">
-            <button type="button" class="btn btn-secondary mini-btn" data-action="progress" data-id="${escapeHtml(item.id)}">In Progress</button>
-            <button type="button" class="btn btn-secondary mini-btn" data-action="complete" data-id="${escapeHtml(item.id)}">Complete</button>
-            <button type="button" class="btn btn-danger mini-btn" data-action="delete" data-id="${escapeHtml(item.id)}">Delete</button>
-          </div>
-        </article>
-      `;
+  function saveQueue() {
+    const serializedQueue = JSON.stringify(queue);
+    writeStoredQueue(localStorage, storageKey, serializedQueue);
+    writeStoredQueue(sessionStorage, storageKey, serializedQueue);
+  }
+
+  function readStoredQueue(storage, key) {
+    try {
+      const stored = storage.getItem(key);
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeStoredQueue(storage, key, value) {
+    try {
+      storage.setItem(key, value);
+    } catch (error) {
+      // The queue still works for the current page even if browser storage is unavailable.
+    }
+  }
+
+  function renderQueue() {
+    const statusFilter = queueStatusFilter.value;
+    const typeFilter = queueTypeFilter.value;
+    const filteredQueue = queue.filter((item) => {
+      const statusMatches = statusFilter === "All" || item.status === statusFilter;
+      const typeMatches = typeFilter === "All" || item.type === typeFilter;
+      return statusMatches && typeMatches;
+    });
+
+    updateCounts();
+    queueCount.textContent = String(filteredQueue.length);
+
+    if (!filteredQueue.length) {
+      queueList.innerHTML = '<div class="queue-empty">No queue items match the current filters.</div>';
+      return;
     }
 
-    function buildDetailRows(item) {
-      const fields = [...commonFields, ...specificFields[item.type]];
-      const rows = fields.map((field) => {
-        const value = item.details[field.name] || "-";
-        const fullClass = field.full || field.type === "textarea" ? " full" : "";
-        return `
-          <div class="detail-row${fullClass}">
-            <span class="detail-label">${escapeHtml(field.label)}</span>
-            <span class="detail-value">${escapeHtml(value)}</span>
+    queueList.innerHTML = filteredQueue.map(renderQueueItem).join("");
+    queueList.querySelectorAll("[data-action]").forEach((button) => {
+      button.addEventListener("click", handleQueueAction);
+    });
+  }
+
+  function renderQueueItem(item) {
+    const details = item.details || {};
+    const title = details.requestTitle || `${item.type} request`;
+    const supplierName = details.supplier || item.supplier || (item.vendor ? item.vendor.name : "");
+    const supplierLine = supplierName ? `Supplier: ${supplierName}` : "No supplier selected";
+    const statusClass = `status-${item.status.toLowerCase().replaceAll(" ", "-")}`;
+    const rows = Object.entries(details)
+      .filter(([key]) => !["form-name", "bot-field"].includes(key))
+      .map(([key, value]) => renderDetailRow(labelize(key), value || "-"))
+      .join("");
+
+    return `
+      <article class="queue-item">
+        <div class="queue-item-head">
+          <div>
+            <h3 class="queue-title">${escapeHtml(title)}</h3>
+            <div class="queue-subtitle">${escapeHtml(item.id)} | ${escapeHtml(formatDateTime(item.createdAt))} | ${escapeHtml(supplierLine)}</div>
           </div>
-        `;
-      });
-
-      if (item.vendor) {
-        rows.push(`
-          <div class="detail-row full">
-            <span class="detail-label">Vendor</span>
-            <span class="detail-value">${escapeHtml(item.vendor.name)} (${escapeHtml(item.vendor.id)}) | ${escapeHtml(item.vendor.contact)}</span>
+          <div class="queue-badges">
+            <span class="badge type">${escapeHtml(item.type)}</span>
+            <span class="badge ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span>
           </div>
-        `);
-      }
+        </div>
+        <div class="queue-details">
+          <details>
+            <summary>Details</summary>
+            <div class="detail-grid">${rows}</div>
+          </details>
+        </div>
+        <div class="queue-actions">
+          <button type="button" class="btn btn-secondary mini-btn" data-action="progress" data-id="${escapeHtml(item.id)}">In Progress</button>
+          <button type="button" class="btn btn-secondary mini-btn" data-action="complete" data-id="${escapeHtml(item.id)}">Complete</button>
+          <button type="button" class="btn btn-danger mini-btn" data-action="delete" data-id="${escapeHtml(item.id)}">Delete</button>
+        </div>
+      </article>
+    `;
+  }
 
-      return rows.join("");
+  function renderDetailRow(label, value) {
+    return `
+      <div class="detail-row">
+        <span class="detail-label">${escapeHtml(label)}</span>
+        <span class="detail-value">${escapeHtml(value)}</span>
+      </div>
+    `;
+  }
+
+  function handleQueueAction(event) {
+    const id = event.currentTarget.dataset.id;
+    const action = event.currentTarget.dataset.action;
+    const index = queue.findIndex((item) => item.id === id);
+    if (index === -1) return;
+
+    if (action === "progress") {
+      queue[index].status = "In Progress";
+      showToast("Queue item marked In Progress.");
     }
 
-    function handleQueueAction(event) {
-      const id = event.currentTarget.dataset.id;
-      const action = event.currentTarget.dataset.action;
-      const index = queue.findIndex((item) => item.id === id);
-      if (index === -1) return;
-
-      if (action === "progress") {
-        queue[index].status = "In Progress";
-        showToast("Queue item marked In Progress.");
-      }
-
-      if (action === "complete") {
-        queue[index].status = "Complete";
-        showToast("Queue item marked Complete.");
-      }
-
-      if (action === "delete") {
-        queue.splice(index, 1);
-        showToast("Queue item deleted.");
-      }
-
-      saveQueue();
-      renderQueue();
+    if (action === "complete") {
+      queue[index].status = "Complete";
+      showToast("Queue item marked Complete.");
     }
 
-    function clearComplete() {
-      const before = queue.length;
-      queue = queue.filter((item) => item.status !== "Complete");
-      saveQueue();
-      renderQueue();
-      showToast(`${before - queue.length} completed item(s) cleared.`);
+    if (action === "delete") {
+      queue.splice(index, 1);
+      showToast("Queue item deleted.");
     }
 
-    function exportQueue() {
-      if (!queue.length) {
-        showToast("There are no queue items to export.");
-        return;
-      }
+    saveQueue();
+    renderQueue();
+  }
 
-      const headers = [
-        "id",
-        "type",
-        "status",
-        "createdAt",
-        "requestTitle",
-        "projectManager",
-        "managingPrincipal",
-        "organization",
-        "estimatedStartDate",
-        "estimatedFinishDate",
-        "vendorId",
-        "vendorName",
-        "details"
+  function clearComplete() {
+    const before = queue.length;
+    queue = queue.filter((item) => item.status !== "Complete");
+    saveQueue();
+    renderQueue();
+    showToast(`${before - queue.length} completed item(s) cleared.`);
+  }
+
+  function exportQueue() {
+    if (!queue.length) {
+      showToast("There are no queue items to export.");
+      return;
+    }
+
+    const headers = ["id", "type", "status", "createdAt", "requestTitle", "projectManager", "managingPrincipal", "organization", "estimatedStartDate", "estimatedFinishDate", "supplier", "details"];
+    const rows = queue.map((item) => {
+      const details = item.details || {};
+      const supplierName = details.supplier || item.supplier || (item.vendor ? item.vendor.name : "");
+      return [
+        item.id,
+        item.type,
+        item.status,
+        item.createdAt,
+        details.requestTitle || "",
+        details.projectManager || "",
+        details.managingPrincipal || "",
+        details.organization || "",
+        details.estimatedStartDate || "",
+        details.estimatedFinishDate || "",
+        supplierName,
+        JSON.stringify(details)
       ];
+    });
 
-      const rows = queue.map((item) => {
-        return [
-          item.id,
-          item.type,
-          item.status,
-          item.createdAt,
-          item.details.requestTitle || "",
-          item.details.projectManager || "",
-          item.details.managingPrincipal || "",
-          item.details.organization || "",
-          item.details.estimatedStartDate || "",
-          item.details.estimatedFinishDate || "",
-          item.vendor ? item.vendor.id : "",
-          item.vendor ? item.vendor.name : "",
-          JSON.stringify(item.details)
-        ];
-      });
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(","))
+      .join("\n");
 
-      const csv = [headers, ...rows]
-        .map((row) => row.map(escapeCsvValue).join(","))
-        .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `deltek-intake-queue-${formatDate(new Date())}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("Queue exported as CSV.");
+  }
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `deltek-intake-queue-${formatDate(new Date())}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast("Queue exported as CSV.");
-    }
+  function updateCounts() {
+    const counts = queue.reduce((summary, item) => {
+      summary[item.status] = (summary[item.status] || 0) + 1;
+      return summary;
+    }, {});
 
-    function updateCounts() {
-      const counts = queue.reduce((summary, item) => {
-        summary[item.status] = (summary[item.status] || 0) + 1;
-        return summary;
-      }, {});
+    document.getElementById("newCount").textContent = `New: ${counts["New"] || 0}`;
+    document.getElementById("progressCount").textContent = `In Progress: ${counts["In Progress"] || 0}`;
+    document.getElementById("completeCount").textContent = `Complete: ${counts["Complete"] || 0}`;
+  }
 
-      document.getElementById("newCount").textContent = `New: ${counts["New"] || 0}`;
-      document.getElementById("progressCount").textContent = `In Progress: ${counts["In Progress"] || 0}`;
-      document.getElementById("completeCount").textContent = `Complete: ${counts["Complete"] || 0}`;
-    }
+  function createRequestId(type) {
+    const prefix = {
+      Opportunity: "OPP",
+      Project: "PRJ",
+      "Supplier PO": "PO"
+    }[type] || "REQ";
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).slice(2, 6).toUpperCase();
+    return `${prefix}-${timestamp}-${random}`;
+  }
 
-    function getSelectedVendor() {
-      return vendors.find((vendor) => vendor.id === vendorSelect.value) || null;
-    }
+  function addDays(date, days) {
+    const copy = new Date(date);
+    copy.setDate(copy.getDate() + days);
+    return copy;
+  }
 
-    function createId(type) {
-      const prefix = intakeTypes.find((item) => item.key === type).short;
-      const timestamp = Date.now().toString(36).toUpperCase();
-      const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-      return `${prefix}-${timestamp}-${random}`;
-    }
+  function formatDate(date) {
+    return date.toISOString().slice(0, 10);
+  }
 
-    function addDays(date, days) {
-      const copy = new Date(date);
-      copy.setDate(copy.getDate() + days);
-      return copy;
-    }
+  function formatDateTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
 
-    function formatDate(date) {
-      return date.toISOString().slice(0, 10);
-    }
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(date);
+  }
 
-    function formatDateTime(value) {
-      const date = new Date(value);
-      return new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-      }).format(date);
-    }
+  function labelize(value) {
+    return String(value)
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-    function escapeCsvValue(value) {
-      const stringValue = String(value ?? "");
-      return `"${stringValue.replaceAll('"', '""')}"`;
-    }
+  function escapeCsvValue(value) {
+    const stringValue = String(value ?? "");
+    return `"${stringValue.replaceAll('"', '""')}"`;
+  }
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2600);
-    }
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2600);
+  }
+})();
 
-    initialize();
   </script>
+  
 </body>
 </html>
+

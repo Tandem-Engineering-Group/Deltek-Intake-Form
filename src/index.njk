@@ -5,8 +5,25 @@ script: /assets/app.js
 ---
 
 {% macro renderField(field) %}
-  <div class="field{% if field.full %} full{% endif %}">
-    <label for="{{ field.name }}">{{ field.label }}{% if field.required %} <span class="required">*</span>{% endif %}</label>
+  <div
+    class="field{% if field.full %} full{% endif %}{% if field.type == "checkbox" %} checkbox-field{% endif %}"
+    {% if field.showFor %}data-show-for="{{ field.showFor | join(',') }}"{% endif %}
+  >
+    {% if field.type == "checkbox" %}
+      <input type="hidden" name="{{ field.name }}" value="No">
+      <label class="checkbox-option" for="{{ field.name }}">
+        <input
+          id="{{ field.name }}"
+          name="{{ field.name }}"
+          type="checkbox"
+          value="Yes"
+          {% if field.required %}required{% endif %}
+          {% if field.checked %}checked{% endif %}
+        >
+        <span>{{ field.label }}{% if field.required %} <span class="required">*</span>{% endif %}</span>
+      </label>
+    {% else %}
+      <label for="{{ field.name }}">{{ field.label }}{% if field.required %} <span class="required">*</span>{% endif %}</label>
     {% if field.type == "textarea" %}
       <textarea id="{{ field.name }}" name="{{ field.name }}" {% if field.required %}required{% endif %}></textarea>
     {% elif field.type == "select" %}
@@ -40,10 +57,11 @@ script: /assets/app.js
         {% if field.step %}step="{{ field.step }}"{% endif %}
       >
     {% endif %}
+    {% endif %}
   </div>
 {% endmacro %}
 
-<div class="app-shell" data-intake-app data-vendor-types="{{ intake.vendorTypes | join(',') }}">
+<div class="app-shell" data-intake-app>
   <header>
     <div class="header-inner">
       <h1>Deltek Intake Form</h1>
@@ -93,6 +111,19 @@ script: /assets/app.js
           </div>
         </fieldset>
 
+        {% for type in intake.types %}
+          {% if intake.topFields[type.key] %}
+            <fieldset class="specific-fieldset" data-type-panel="{{ type.key }}" hidden disabled>
+              <legend>{{ type.key }} Setup</legend>
+              <div class="form-grid">
+                {% for field in intake.topFields[type.key] %}
+                  {{ renderField(field) }}
+                {% endfor %}
+              </div>
+            </fieldset>
+          {% endif %}
+        {% endfor %}
+
         <fieldset id="commonFieldset" hidden disabled>
           <legend>Request Details</legend>
           <div class="form-grid">
@@ -109,36 +140,39 @@ script: /assets/app.js
               {% for field in intake.specificFields[type.key] %}
                 {{ renderField(field) }}
               {% endfor %}
+              {% if type.key == "Project" %}
+                <div class="supplier-section full" data-supplier-section>
+                  <div class="supplier-section-head">
+                    <h3>Suppliers</h3>
+                    <button type="button" class="icon-btn" id="addSupplier" aria-label="Add supplier">+</button>
+                  </div>
+                  <div class="supplier-list">
+                    {% for supplierNumber in intake.supplierSlots %}
+                      <div class="supplier-row" data-supplier-row{% if supplierNumber > 1 %} hidden{% endif %}>
+                        <div class="field">
+                          <label for="supplier{{ supplierNumber }}">Supplier {{ supplierNumber }}</label>
+                          <input
+                            id="supplier{{ supplierNumber }}"
+                            name="supplier{{ supplierNumber }}"
+                            type="text"
+                            list="supplierOptions"
+                            autocomplete="off"
+                            {% if supplierNumber > 1 %}disabled{% endif %}
+                          >
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <datalist id="supplierOptions">
+                    {% for vendor in intake.vendors %}
+                      <option value="{{ vendor.name }}"></option>
+                    {% endfor %}
+                  </datalist>
+                </div>
+              {% endif %}
             </div>
           </fieldset>
         {% endfor %}
-
-        <fieldset id="vendorFieldset" hidden disabled>
-          <legend>Vendor Lookup</legend>
-          <div class="vendor-panel">
-            <div class="field">
-              <label for="vendorSearch">Vendor search</label>
-              <input id="vendorSearch" name="vendorSearch" type="search" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="vendorId">Vendor <span class="required">*</span></label>
-              <select id="vendorId" name="vendorId" required>
-                <option value="">Select vendor</option>
-                {% for vendor in intake.vendors %}
-                  <option
-                    value="{{ vendor.id }}"
-                    data-name="{{ vendor.name }}"
-                    data-category="{{ vendor.category }}"
-                    data-contact="{{ vendor.contact }}"
-                    data-terms="{{ vendor.terms }}"
-                    data-status="{{ vendor.status }}"
-                  >{{ vendor.name }} ({{ vendor.id }})</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="vendor-details" id="vendorDetails" aria-live="polite"></div>
-          </div>
-        </fieldset>
 
         <div class="actions" id="formActions">
           <div class="left-actions" id="requestActions" hidden>

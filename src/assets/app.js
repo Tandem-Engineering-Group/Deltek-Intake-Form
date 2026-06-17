@@ -5,10 +5,6 @@
   const form = document.getElementById("intakeForm");
   const commonFieldset = document.getElementById("commonFieldset");
   const requestActions = document.getElementById("requestActions");
-  const vendorFieldset = document.getElementById("vendorFieldset");
-  const vendorSearch = document.getElementById("vendorSearch");
-  const vendorSelect = document.getElementById("vendorId");
-  const vendorDetails = document.getElementById("vendorDetails");
   const requestIdInput = document.getElementById("requestId");
   const createdAtInput = document.getElementById("createdAt");
   const queueList = document.getElementById("queueList");
@@ -17,21 +13,12 @@
   const queueTypeFilter = document.getElementById("queueTypeFilter");
   const fillSampleButton = document.getElementById("fillSample");
   const toast = document.getElementById("toast");
+  const addSupplierButton = document.getElementById("addSupplier");
+  const supplierRows = Array.from(document.querySelectorAll("[data-supplier-row]"));
+  const typeScopedFields = Array.from(document.querySelectorAll("[data-show-for]"));
 
   const storageKey = "deltek-intake-queue-v2";
   const legacyStorageKeys = ["deltek-intake-queue-v1"];
-  const vendorTypes = app.dataset.vendorTypes.split(",").filter(Boolean);
-  const allVendorOptions = Array.from(vendorSelect.options)
-    .filter((option) => option.value)
-    .map((option) => ({
-      id: option.value,
-      name: option.dataset.name,
-      category: option.dataset.category,
-      contact: option.dataset.contact,
-      terms: option.dataset.terms,
-      status: option.dataset.status,
-      label: option.textContent
-    }));
 
   let selectedType = "";
   let queue = loadQueue();
@@ -47,16 +34,14 @@
       resetIntakeForm();
     });
     fillSampleButton.addEventListener("click", fillSampleData);
-    vendorSearch.addEventListener("input", renderVendorOptions);
-    vendorSelect.addEventListener("change", renderVendorDetails);
+    if (addSupplierButton) addSupplierButton.addEventListener("click", addSupplierRow);
     queueStatusFilter.addEventListener("change", renderQueue);
     queueTypeFilter.addEventListener("change", renderQueue);
     document.getElementById("exportQueue").addEventListener("click", exportQueue);
     document.getElementById("clearComplete").addEventListener("click", clearComplete);
 
     setSelectedType("");
-    renderVendorOptions();
-    renderVendorDetails();
+    resetSupplierRows();
     renderQueue();
   }
 
@@ -65,6 +50,7 @@
     form.querySelectorAll("[data-type-radio]").forEach((radio) => {
       radio.checked = false;
     });
+    resetSupplierRows();
     setSelectedType("");
   }
 
@@ -94,13 +80,10 @@
       panel.disabled = !isActive;
     });
 
-    const needsVendor = vendorTypes.includes(selectedType);
-    vendorFieldset.hidden = !needsVendor;
-    vendorFieldset.disabled = !needsVendor;
+    updateTypeScopedFields();
 
-    if (!needsVendor) {
-      vendorSearch.value = "";
-      vendorSelect.value = "";
+    if (selectedType !== "Project") {
+      resetSupplierRows();
     }
 
     if (!hasType) {
@@ -111,8 +94,18 @@
     }
 
     updateTypeOptionsLock();
-    renderVendorOptions();
-    renderVendorDetails();
+    updateAddSupplierButton();
+  }
+
+  function updateTypeScopedFields() {
+    typeScopedFields.forEach((field) => {
+      const allowedTypes = field.dataset.showFor.split(",").filter(Boolean);
+      const isVisible = Boolean(selectedType) && allowedTypes.includes(selectedType);
+      field.hidden = !isVisible;
+      field.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.disabled = !isVisible;
+      });
+    });
   }
 
   function updateTypeOptionsLock() {
@@ -148,13 +141,14 @@
   }
 
   function storeLocalQueueItem(formData) {
+    const details = Object.fromEntries(formData.entries());
     const item = {
       id: requestIdInput.value,
       type: selectedType,
       status: "New",
       createdAt: createdAtInput.value,
-      details: Object.fromEntries(formData.entries()),
-      vendor: getSelectedVendor()
+      details,
+      supplier: details.supplier || ""
     };
 
     queue = queue.filter((existing) => existing.id !== item.id);
@@ -174,71 +168,6 @@
     });
   }
 
-  function renderVendorOptions() {
-    const currentValue = vendorSelect.value;
-    const searchTerm = vendorSearch.value.trim().toLowerCase();
-    const filtered = allVendorOptions.filter((vendor) => {
-      return [vendor.id, vendor.name, vendor.category, vendor.contact].some((value) => {
-        return String(value).toLowerCase().includes(searchTerm);
-      });
-    });
-
-    vendorSelect.innerHTML = '<option value="">Select vendor</option>';
-    filtered.forEach((vendor) => {
-      const option = document.createElement("option");
-      option.value = vendor.id;
-      option.textContent = vendor.label;
-      option.dataset.name = vendor.name;
-      option.dataset.category = vendor.category;
-      option.dataset.contact = vendor.contact;
-      option.dataset.terms = vendor.terms;
-      option.dataset.status = vendor.status;
-      vendorSelect.appendChild(option);
-    });
-
-    if (filtered.some((vendor) => vendor.id === currentValue)) {
-      vendorSelect.value = currentValue;
-    }
-  }
-
-  function renderVendorDetails() {
-    const vendor = getSelectedVendor();
-    const rows = vendor
-      ? [
-          ["Vendor ID", vendor.id],
-          ["Category", vendor.category],
-          ["Contact", vendor.contact],
-          ["Terms", vendor.terms]
-        ]
-      : [
-          ["Vendor ID", "-"],
-          ["Category", "-"],
-          ["Contact", "-"],
-          ["Terms", "-"]
-        ];
-
-    vendorDetails.innerHTML = rows.map(([label, value]) => `
-      <div class="detail-box">
-        <span class="detail-label">${escapeHtml(label)}</span>
-        <span class="detail-value">${escapeHtml(value)}</span>
-      </div>
-    `).join("");
-  }
-
-  function getSelectedVendor() {
-    const selectedOption = vendorSelect.selectedOptions[0];
-    if (!selectedOption || !selectedOption.value) return null;
-
-    return {
-      id: selectedOption.value,
-      name: selectedOption.dataset.name,
-      category: selectedOption.dataset.category,
-      contact: selectedOption.dataset.contact,
-      terms: selectedOption.dataset.terms,
-      status: selectedOption.dataset.status
-    };
-  }
-
   function fillSampleData() {
     if (!selectedType) {
       showToast("Select a request type before loading sample data.");
@@ -251,7 +180,6 @@
     Object.entries(samples).forEach(([id, value]) => {
       setValue(id, value);
     });
-    renderVendorDetails();
   }
 
   function getSampleData(type) {
@@ -259,47 +187,46 @@
     const commonSample = {
       requestTitle: {
         Opportunity: "Automated inspection line pursuit",
-        Promo: "Safety week giveaway",
         Project: "Packaging line controls upgrade",
         "Supplier PO": "Safety equipment order"
       }[type],
       projectManager: "Jordan Lee",
       managingPrincipal: "Taylor Morgan",
       organization: "Tandem DET",
-      estimatedStartDate: formatDate(addDays(today, 10)),
-      estimatedFinishDate: formatDate(addDays(today, 45))
+      ...(type === "Supplier PO" ? {} : {
+        estimatedStartDate: formatDate(addDays(today, 10)),
+        estimatedFinishDate: formatDate(addDays(today, 45))
+      })
     };
 
     const typeSamples = {
       Opportunity: {
+        opportunityCreatePromoProject: "Yes",
         opportunityName: "North plant modernization",
         estimatedRevenue: "125000.00",
         probability: "70%",
         stage: "proposal",
         engineeringCategory: "controls",
         source: "Tradeshow",
-        primaryClient: "Atlas Manufacturing"
-      },
-      Promo: {
-        vendorId: "V-10014",
-        campaignName: "Safety week giveaway",
-        itemDescription: "Branded high-visibility safety shirts",
-        quantity: "150",
-        inHandsDate: formatDate(addDays(today, 30)),
-        budget: "3200.00",
-        shipTo: "Richmond field office"
+        primaryClient: "Atlas Manufacturing",
+        mainContactName: "Maya Chen",
+        mainContactPhone: "555-0142"
       },
       Project: {
+        projectCreatePromoProject: "Yes",
         projectName: "Packaging line controls upgrade",
         clientName: "Atlas Manufacturing",
-        projectCode: "PRJ-4521",
-        contractType: "Time and Materials"
+        contractType: "Time and Materials",
+        supplierMarkupRate: "15%",
+        supplier1: "Acme Promotional Products",
+        supplier2: "Midwest Industrial Supply"
       },
       "Supplier PO": {
-        vendorId: "V-11063",
+        supplier: "Summit Hardware and Safety (V-11063)",
         poDescription: "Replacement PPE and field safety supplies",
         amount: "2850.00",
-        buyer: "Taylor Morgan",
+        paymentTerms: "Net 30",
+        mainContact: "Taylor Morgan",
         deliveryDate: formatDate(addDays(today, 45)),
         deliverTo: "Richmond field office",
         glOrProjectCode: "OPS-4521"
@@ -317,7 +244,56 @@
 
   function setValue(id, value) {
     const element = document.getElementById(id);
-    if (element) element.value = value;
+    if (!element) return;
+
+    const supplierRow = element.closest("[data-supplier-row]");
+    if (supplierRow) {
+      showSupplierRow(supplierRow);
+    }
+
+    if (element.type === "checkbox") {
+      const normalizedValue = String(value).trim().toLowerCase();
+      element.checked = value === true || ["yes", "true", "1", "checked"].includes(normalizedValue);
+      return;
+    }
+
+    element.value = value;
+  }
+
+  function addSupplierRow() {
+    const nextRow = supplierRows.find((row) => row.hidden);
+    if (!nextRow) return;
+
+    showSupplierRow(nextRow);
+    const input = nextRow.querySelector("input");
+    if (input) input.focus();
+    updateAddSupplierButton();
+  }
+
+  function showSupplierRow(row) {
+    row.hidden = false;
+    row.querySelectorAll("input, select, textarea, button").forEach((control) => {
+      control.disabled = false;
+    });
+    updateAddSupplierButton();
+  }
+
+  function resetSupplierRows() {
+    supplierRows.forEach((row, index) => {
+      row.hidden = index > 0;
+      row.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.value = "";
+        control.disabled = index > 0;
+      });
+    });
+    updateAddSupplierButton();
+  }
+
+  function updateAddSupplierButton() {
+    if (!addSupplierButton) return;
+
+    const visibleCount = supplierRows.filter((row) => !row.hidden).length;
+    addSupplierButton.disabled = selectedType !== "Project" || visibleCount >= supplierRows.length;
   }
 
   function loadQueue() {
@@ -378,7 +354,8 @@
   function renderQueueItem(item) {
     const details = item.details || {};
     const title = details.requestTitle || `${item.type} request`;
-    const vendorLine = item.vendor ? `Vendor: ${item.vendor.name}` : "No vendor lookup";
+    const supplierName = details.supplier || item.supplier || (item.vendor ? item.vendor.name : "");
+    const supplierLine = supplierName ? `Supplier: ${supplierName}` : "No supplier selected";
     const statusClass = `status-${item.status.toLowerCase().replaceAll(" ", "-")}`;
     const rows = Object.entries(details)
       .filter(([key]) => !["form-name", "bot-field"].includes(key))
@@ -390,7 +367,7 @@
         <div class="queue-item-head">
           <div>
             <h3 class="queue-title">${escapeHtml(title)}</h3>
-            <div class="queue-subtitle">${escapeHtml(item.id)} | ${escapeHtml(formatDateTime(item.createdAt))} | ${escapeHtml(vendorLine)}</div>
+            <div class="queue-subtitle">${escapeHtml(item.id)} | ${escapeHtml(formatDateTime(item.createdAt))} | ${escapeHtml(supplierLine)}</div>
           </div>
           <div class="queue-badges">
             <span class="badge type">${escapeHtml(item.type)}</span>
@@ -460,9 +437,10 @@
       return;
     }
 
-    const headers = ["id", "type", "status", "createdAt", "requestTitle", "projectManager", "managingPrincipal", "organization", "estimatedStartDate", "estimatedFinishDate", "vendorId", "vendorName", "details"];
+    const headers = ["id", "type", "status", "createdAt", "requestTitle", "projectManager", "managingPrincipal", "organization", "estimatedStartDate", "estimatedFinishDate", "supplier", "details"];
     const rows = queue.map((item) => {
       const details = item.details || {};
+      const supplierName = details.supplier || item.supplier || (item.vendor ? item.vendor.name : "");
       return [
         item.id,
         item.type,
@@ -474,8 +452,7 @@
         details.organization || "",
         details.estimatedStartDate || "",
         details.estimatedFinishDate || "",
-        item.vendor ? item.vendor.id : "",
-        item.vendor ? item.vendor.name : "",
+        supplierName,
         JSON.stringify(details)
       ];
     });
@@ -510,7 +487,6 @@
   function createRequestId(type) {
     const prefix = {
       Opportunity: "OPP",
-      Promo: "PRM",
       Project: "PRJ",
       "Supplier PO": "PO"
     }[type] || "REQ";
