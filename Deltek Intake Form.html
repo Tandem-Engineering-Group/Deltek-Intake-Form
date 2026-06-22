@@ -1154,29 +1154,107 @@ summary {
               
                 
   <div
-    class="field"
+    class="field full checkbox-field"
     
   >
     
-      <label for="primaryClient">Primary client <span class="required">*</span></label>
+      <input type="hidden" name="opportunityNewClient" value="No">
+      <label class="checkbox-option" for="opportunityNewClient">
+        <input
+          id="opportunityNewClient"
+          name="opportunityNewClient"
+          type="checkbox"
+          value="Yes"
+          
+          
+        >
+        <span>New client?</span>
+      </label>
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    data-client-field="existing"
+  >
+    
+      <label for="primaryClient">Existing client <span class="required">*</span></label>
+    
+      <select id="primaryClient" name="primaryClient" required>
+        <option value="">Select existing client</option>
+        
+          <option value="Atlas Manufacturing">Atlas Manufacturing</option>
+        
+          <option value="North Plant Operations">North Plant Operations</option>
+        
+          <option value="River City Packaging">River City Packaging</option>
+        
+      </select>
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    data-client-field="new" hidden
+  >
+    
+      <label for="newClientName">Client name <span class="required">*</span></label>
     
       <input
-        id="primaryClient"
-        name="primaryClient"
+        id="newClientName"
+        name="newClientName"
         type="text"
-        list="primaryClientOptions"
-        autocomplete="off"
         required
+        
+        
       >
-      <datalist id="primaryClientOptions">
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    data-client-field="new" hidden
+  >
+    
+      <label for="newClientPhone">Client phone number <span class="required">*</span></label>
+    
+      <input
+        id="newClientPhone"
+        name="newClientPhone"
+        type="tel"
+        required
         
-          <option value="Atlas Manufacturing"></option>
         
-          <option value="North Plant Operations"></option>
+      >
+    
+    
+  </div>
+
+              
+                
+  <div
+    class="field"
+    data-client-field="new" hidden
+  >
+    
+      <label for="newClientEmail">Client email <span class="required">*</span></label>
+    
+      <input
+        id="newClientEmail"
+        name="newClientEmail"
+        type="email"
+        required
         
-          <option value="River City Packaging"></option>
         
-      </datalist>
+      >
     
     
   </div>
@@ -1769,6 +1847,8 @@ summary {
   const addSupplierButton = document.getElementById("addSupplier");
   const supplierRows = Array.from(document.querySelectorAll("[data-supplier-row]"));
   const typeScopedFields = Array.from(document.querySelectorAll("[data-show-for]"));
+  const opportunityNewClientInput = document.getElementById("opportunityNewClient");
+  const opportunityClientFields = Array.from(document.querySelectorAll("[data-client-field]"));
 
   const storageKey = "deltek-intake-queue-v2";
   const legacyStorageKeys = ["deltek-intake-queue-v1"];
@@ -1809,12 +1889,11 @@ summary {
 
   function handleFormChange(event) {
     if (event.target.matches("[data-type-radio]")) {
-      if (selectedType && event.target.value !== selectedType) {
-        event.target.checked = false;
-        return;
-      }
-
       setSelectedType(event.target.value);
+    }
+
+    if (event.target === opportunityNewClientInput) {
+      updateOpportunityClientFields();
     }
   }
 
@@ -1834,19 +1913,15 @@ summary {
     });
 
     updateTypeScopedFields();
-
-    if (selectedType !== "Project") {
-      resetSupplierRows();
-    }
+    updateOpportunityClientFields();
 
     if (!hasType) {
       requestIdInput.value = "";
       createdAtInput.value = "";
-    } else if (!requestIdInput.value) {
+    } else {
       requestIdInput.value = createRequestId(selectedType);
     }
 
-    updateTypeOptionsLock();
     updateAddSupplierButton();
   }
 
@@ -1858,12 +1933,6 @@ summary {
       field.querySelectorAll("input, select, textarea, button").forEach((control) => {
         control.disabled = !isVisible;
       });
-    });
-  }
-
-  function updateTypeOptionsLock() {
-    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
-      radio.disabled = Boolean(selectedType) && radio.value !== selectedType;
     });
   }
 
@@ -1933,6 +2002,8 @@ summary {
     Object.entries(samples).forEach(([id, value]) => {
       setValue(id, value);
     });
+
+    updateOpportunityClientFields();
   }
 
   function getSampleData(type) {
@@ -2040,6 +2111,26 @@ summary {
       });
     });
     updateAddSupplierButton();
+  }
+
+  function updateOpportunityClientFields() {
+    const isOpportunity = selectedType === "Opportunity";
+    const isNewClient = Boolean(opportunityNewClientInput && opportunityNewClientInput.checked);
+
+    opportunityClientFields.forEach((field) => {
+      const shouldShow = isOpportunity && (
+        field.dataset.clientField === "new" ? isNewClient : !isNewClient
+      );
+
+      field.hidden = !shouldShow;
+      field.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.disabled = !shouldShow;
+
+        if (!shouldShow && control.type !== "hidden") {
+          control.value = "";
+        }
+      });
+    });
   }
 
   function updateAddSupplierButton() {
@@ -2306,4 +2397,3 @@ summary {
   
 </body>
 </html>
-

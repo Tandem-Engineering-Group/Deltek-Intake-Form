@@ -6,11 +6,8 @@ Static Eleventy site for Deltek intake requests. The deployed form posts to Netl
 
 ```bash
 npm install
-npm run sync-lookups
 npm run start
 ```
-
-`data/intake-lookups.xlsx` is the editable source for employees, organizations, primary clients, and vendors. `npm run sync-lookups` converts it to `src/_data/intake-lookups.json`; `npm run build` and `npm run start` run that sync automatically. If the workbook ever needs to be recreated from scratch, run `npm run init-lookups`.
 
 ## Netlify Deployment
 
@@ -21,3 +18,5 @@ npm run start
 5. After the first deploy, submissions appear in Netlify under Forms > `deltek-intake`.
 
 The in-page queue stores a local copy in the submitter's browser. The shared processing queue is Netlify Forms.
+# Projects
+

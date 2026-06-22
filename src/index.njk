@@ -7,7 +7,7 @@ script: /assets/app.js
 {% macro renderField(field) %}
   <div
     class="field{% if field.full %} full{% endif %}{% if field.type == "checkbox" %} checkbox-field{% endif %}"
-    {% if field.showFor %}data-show-for="{{ field.showFor | join(',') }}"{% endif %}
+    {% if field.showFor %}data-show-for="{{ field.showFor | join(',') }}"{% endif %}{% if field.clientMode %}{% if field.showFor %} {% endif %}data-client-field="{{ field.clientMode }}"{% if field.clientMode == "new" %} hidden{% endif %}{% endif %}
   >
     {% if field.type == "checkbox" %}
       <input type="hidden" name="{{ field.name }}" value="No">

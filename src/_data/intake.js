@@ -41,7 +41,11 @@ module.exports = {
       { name: "stage", label: "Stage", type: "select", required: true, options: ["preproposal", "proposal", "bid", "award", "pre-award"] },
       { name: "engineeringCategory", label: "Engineering category", type: "select", required: true, options: ["industrial", "automotive", "electrical", "mechanical", "structural", "conveyor", "controls"] },
       { name: "source", label: "Source", type: "select", required: true, options: ["Tradeshow", "bid", "government", "marketing", "other"] },
-      { name: "primaryClient", label: "Primary client", type: "lookup", required: true, options: deltekClients },
+      { name: "opportunityNewClient", label: "New client?", type: "checkbox", full: true },
+      { name: "primaryClient", label: "Existing client", type: "select", required: true, options: deltekClients, clientMode: "existing" },
+      { name: "newClientName", label: "Client name", type: "text", required: true, clientMode: "new" },
+      { name: "newClientPhone", label: "Client phone number", type: "tel", required: true, clientMode: "new" },
+      { name: "newClientEmail", label: "Client email", type: "email", required: true, clientMode: "new" },
       { name: "mainContactName", label: "Main contact name", type: "text", required: true },
       { name: "mainContactPhone", label: "Main contact phone", type: "tel", required: true }
     ],

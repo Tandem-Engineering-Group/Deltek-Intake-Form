@@ -16,6 +16,8 @@
   const addSupplierButton = document.getElementById("addSupplier");
   const supplierRows = Array.from(document.querySelectorAll("[data-supplier-row]"));
   const typeScopedFields = Array.from(document.querySelectorAll("[data-show-for]"));
+  const opportunityNewClientInput = document.getElementById("opportunityNewClient");
+  const opportunityClientFields = Array.from(document.querySelectorAll("[data-client-field]"));
 
   const storageKey = "deltek-intake-queue-v2";
   const legacyStorageKeys = ["deltek-intake-queue-v1"];
@@ -56,12 +58,11 @@
 
   function handleFormChange(event) {
     if (event.target.matches("[data-type-radio]")) {
-      if (selectedType && event.target.value !== selectedType) {
-        event.target.checked = false;
-        return;
-      }
-
       setSelectedType(event.target.value);
+    }
+
+    if (event.target === opportunityNewClientInput) {
+      updateOpportunityClientFields();
     }
   }
 
@@ -81,19 +82,15 @@
     });
 
     updateTypeScopedFields();
-
-    if (selectedType !== "Project") {
-      resetSupplierRows();
-    }
+    updateOpportunityClientFields();
 
     if (!hasType) {
       requestIdInput.value = "";
       createdAtInput.value = "";
-    } else if (!requestIdInput.value) {
+    } else {
       requestIdInput.value = createRequestId(selectedType);
     }
 
-    updateTypeOptionsLock();
     updateAddSupplierButton();
   }
 
@@ -105,12 +102,6 @@
       field.querySelectorAll("input, select, textarea, button").forEach((control) => {
         control.disabled = !isVisible;
       });
-    });
-  }
-
-  function updateTypeOptionsLock() {
-    form.querySelectorAll("[data-type-radio]").forEach((radio) => {
-      radio.disabled = Boolean(selectedType) && radio.value !== selectedType;
     });
   }
 
@@ -180,6 +171,8 @@
     Object.entries(samples).forEach(([id, value]) => {
       setValue(id, value);
     });
+
+    updateOpportunityClientFields();
   }
 
   function getSampleData(type) {
@@ -287,6 +280,26 @@
       });
     });
     updateAddSupplierButton();
+  }
+
+  function updateOpportunityClientFields() {
+    const isOpportunity = selectedType === "Opportunity";
+    const isNewClient = Boolean(opportunityNewClientInput && opportunityNewClientInput.checked);
+
+    opportunityClientFields.forEach((field) => {
+      const shouldShow = isOpportunity && (
+        field.dataset.clientField === "new" ? isNewClient : !isNewClient
+      );
+
+      field.hidden = !shouldShow;
+      field.querySelectorAll("input, select, textarea, button").forEach((control) => {
+        control.disabled = !shouldShow;
+
+        if (!shouldShow && control.type !== "hidden") {
+          control.value = "";
+        }
+      });
+    });
   }
 
   function updateAddSupplierButton() {
